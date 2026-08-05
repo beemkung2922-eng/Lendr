@@ -152,8 +152,12 @@
     position:relative; z-index:2; flex:none; box-shadow:var(--shadow-1); cursor:pointer;
   }
 
-  .logo-mark img { width: 75%; height: 75%; object-fit: contain; }
-  
+.logo-mark img { 
+  width: 100%;  
+  height: 100%;  
+  object-fit: cover; /* ทำให้รูปเต็มพื้นที่วงกลมพอดี */
+  border-radius: 50%; /* ทำให้รูปถูกตัดมุมเป็นวงกลมพอดีกับกรอบ */
+}  
   .nav-pill{
     display:flex; align-items:center; gap:4px;
     background:var(--surface); border:1.5px solid var(--line-strong);
@@ -575,8 +579,9 @@
 <header class="topbar">
   <div class="wrap">
     <div class="bar">
-      <div class="logo-mark" aria-hidden="true">ยด</div>
-        <nav class="nav-pill" role="tablist" aria-label="เมนูหลัก">
+<div class="logo-mark" aria-hidden="true" >
+  <img src="lo.png" alt="Logo">
+</div>        <nav class="nav-pill" role="tablist" aria-label="เมนูหลัก">
           <button class="pill active" data-view="home" role="tab" aria-selected="true">
             <span class="hover-circle" aria-hidden="true"></span>
             <span class="label-stack"><span class="pill-label">หน้าหลัก</span><span class="pill-label-hover" aria-hidden="true">หน้าหลัก</span></span>
@@ -616,23 +621,17 @@
         <span class="hf-label">ว่างพร้อมใช้งานตอนนี้</span>
         <span class="hf-value"><span class="dot-live"></span><span id="hero-float-avail">–</span></span>
       </div>
-      <div class="hero-float hero-float-badge badge-1">จองใน 3 ขั้นตอน</div>
-      <div class="hero-float hero-float-badge badge-2">ไม่ต้องโทรถาม IT</div>
-      <div class="hero-float hero-float-review">
-        <span class="hf-avatar">ยด</span>
-        <span class="hf-text"><strong>พนักงานใช้งานจริง</strong><span>เช็กของว่างและจองได้เอง</span></span>
-      </div>
 
       <div class="splash-content">
         <span class="splash-eyebrow"># ระบบจองอุปกรณ์ภายในบริษัท</span>
         <h1 class="splash-title">เช็กของว่าง จอง<br>แล้วรับของได้เลย</h1>
-        <p class="splash-desc">ดูสถานะอุปกรณ์ทุกชิ้นแบบเรียลไทม์ จองล่วงหน้าได้ในไม่กี่ขั้นตอน<br>ไม่ต้องโทรถามแผนกไอทีหรือธุรการอีกต่อไป</p>
+        <p class="splash-desc">ดูสถานะอุปกรณ์ทุกชิ้นแบบเรียลไทม์ จองล่วงหน้าได้ในไม่กี่ขั้นตอน<br></p>
         
         <button class="btn-splash" data-goto="equipment">
           <span class="icon-circle">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           </span>
-          <span style="flex:1; text-align:center;">เริ่มต้นใช้งาน (Get Started)</span>
+          <span style="flex:1; text-align:center;">Get Started</span>
           <span class="arrow">>>></span>
         </button>
       </div>
