@@ -1,1274 +1,1145 @@
 <!DOCTYPE html>
-<html lang="th" data-theme="light">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Lendr</title>
+<title>Lendr - ระบบจองอุปกรณ์</title>
 <link rel="icon" type="image/png" href="lo.png">
-<meta name="description" content="ระบบจองอุปกรณ์สำหรับพนักงานในบริษัท เช็กของว่าง จอง และติดตามการจองได้ในที่เดียว">
+<meta name="description" content="ระบบจองอุปกรณ์และติดตามสถานะแบบเรียลไทม์">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- นำเข้า GSAP สำหรับทำ Animation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* ===================== Tokens ===================== */
-  :root{
-    --font-display:'Kanit','IBM Plex Sans Thai',sans-serif;
-    --font-body:'IBM Plex Sans Thai','IBM Plex Sans',sans-serif;
-    --radius-xl:32px;
-    --radius-lg:24px;
-    --radius-md:16px;
-    --radius-sm:10px;
-    --radius-pill:999px;
-    --shadow-1:0 1px 2px rgba(10,10,15,.06);
-    --shadow-2:0 16px 40px rgba(10,10,15,.18);
-    --shadow-up:0 -4px 20px rgba(0,0,0,.08);
-    --ease:cubic-bezier(.2,.8,.2,1);
-    --dur:200ms;
+  /* ===================== TOKENS & VARIABLES ===================== */
+  :root {
+    /* Liquid Glass Theme Colors */
+    --bg-dark-1: #131939;
+    --bg-dark-2: #282049;
+    --primary-purple: #926bf8;
+    --primary-purple-light: #b5a0ff;
+    --primary-cyan: #11e5b4;
+    
+    --surface: rgba(255, 255, 255, 0.05);
+    --surface-solid: #1c1c1e;
+    --dial-bg: #222224;
+    --dial-bg-inner: #2c2c2e;
+    
+    --text-main: #ffffff;
+    --text-dark: #000000;
+    --text-muted: rgba(255, 255, 255, 0.5);
+    --danger: #ff5c7a;
+    
+    --radius-xl: 32px;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+    --radius-pill: 999px;
+    --font-th: 'Kanit', sans-serif;
+    --font-en: 'Inter', sans-serif;
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --glass-blur: blur(16px);
   }
 
-  html[data-theme="light"]{
-    --bg:#EDEFEF; --dot:rgba(20,21,26,.16);
-    --surface:#FFFFFF; --surface-2:#F5F6F4; --surface-3:#E9EBE8;
-    --ink:#14151A; --ink-soft:#5B5E66; --ink-faint:#8A8D94;
-    --line:rgba(20,21,26,.13); --line-strong:rgba(20,21,26,.28);
-    --accent:#14151A; --accent-2:#14151A; --accent-ink:#FFFFFF;
-    --chip-avail-bg:#D9F2E7; --chip-avail-ink:#0B7A5C;
-    --chip-busy-bg:#FFEBC2; --chip-busy-ink:#8A5A00;
-    --chip-maint-bg:#F5D9D9; --chip-maint-ink:#B23A3A;
-    --danger:#C23B3B; --danger-ink:#FFFFFF;
-    --warning-bg: #FFF3CD; --warning-ink: #856404;
-  }
-  html[data-theme="dark"]{
-    --bg:#111216; --dot:rgba(244,245,243,.14);
-    --surface:#191A1F; --surface-2:#1F2026; --surface-3:#26272E;
-    --ink:#F4F5F3; --ink-soft:#A2A4AC; --ink-faint:#6F7178;
-    --line:rgba(244,245,243,.12); --line-strong:rgba(244,245,243,.26);
-    --accent:#F4F5F3; --accent-2:#F4F5F3; --accent-ink:#111216;
-    --chip-avail-bg:rgba(43,199,174,.16); --chip-avail-ink:#6FE3CC;
-    --chip-busy-bg:rgba(255,194,75,.16); --chip-busy-ink:#FFC24B;
-    --chip-maint-bg:rgba(255,107,107,.16); --chip-maint-ink:#FF9494;
-    --danger:#E15656; --danger-ink:#111216;
-    --warning-bg: rgba(255,194,75,.16); --warning-ink: #FFC24B;
-  }
-
-  *{box-sizing:border-box;}
-  html{-webkit-text-size-adjust:100%; scroll-behavior: smooth;}
-  body{
-    margin:0; font-family:var(--font-body); color:var(--ink);
-    background-color:var(--bg); background-image:radial-gradient(var(--dot) 1.4px, transparent 1.4px);
-    background-size:22px 22px; min-height:100vh;
-    transition:background-color var(--dur) var(--ease), color var(--dur) var(--ease);
-  }
-  h1,h2,h3,h4{font-family:var(--font-display); margin:0; font-weight:700; letter-spacing:.01em;}
-  p{margin:0;} button{font-family:inherit;} a{color:inherit;}
-  ::selection{background:var(--accent); color:var(--accent-ink);}
-  :focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:6px;}
-
-  .wrap{max-width:1180px; margin:0 auto; padding:0 clamp(16px,4vw,40px);}
-
- /* ===================== Header / Pill Nav ===================== */
-  header.topbar{ padding:clamp(18px,3vw,32px) 0 16px; margin-bottom: 32px; }
-  .site-intro { text-align: center; max-width: 680px; margin: 0 auto 48px auto; animation: fadeUp 500ms var(--ease); }
-  .site-intro h2 { font-size: clamp(20px, 2.5vw, 26px); margin-bottom: 8px; }
-  .site-intro p { color: var(--ink-soft); font-size: 14.5px; line-height: 1.6; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   
-  .bar{ display:flex; align-items:center; justify-content:center; position: relative; gap:14px; flex-wrap:wrap; }
-  .brand-row{display:flex; align-items:center; gap:0; flex:0 0 auto;}
-  .logo-mark{
-  width:46px; height:46px; border-radius:50%; background:var(--ink); color:var(--bg);
-  display:flex; align-items:center; justify-content:center;
-  font-family:var(--font-display); font-weight:800; font-size:17px;
-  position:relative; z-index:2; flex:none; box-shadow:var(--shadow-1); cursor:pointer;
-}
+  body {
+    background-color: var(--bg-dark-1);
+    color: var(--text-main);
+    font-family: var(--font-th);
+    overflow-x: hidden;
+    background-image: 
+      radial-gradient(rgba(255,255,255,0.08) 1.5px, transparent 1.5px),
+      linear-gradient(135deg, var(--bg-dark-1) 0%, var(--bg-dark-2) 100%);
+    background-size: 24px 24px, 100% 100%;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  ::-webkit-scrollbar { display: none; }
 
-/* เพิ่ม CSS สำหรับจัดการรูปภาพด้านในโลโก้ */
-.logo-mark img {
-  width: 75%; /* ปรับตัวเลขนี้ลง (เช่น 70% - 80%) เพื่อย่อขนาดรูปลง */
-  height: 75%; /* ต้องปรับให้เท่ากับ width รูปจะได้ไม่เบี้ยว */
-  object-fit: contain; /* เปลี่ยนจาก cover เป็น contain เพื่อให้รูปคงสัดส่วนเดิมและอยู่พอดีในกรอบ */
-}
+  /* ===================== APP LAYOUT ===================== */
+  .app-container {
+    max-width: 560px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    background: transparent;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    overflow-x: hidden;
+    padding-bottom: 110px;
+  }
+
+  .view { display: none; animation: fadeIn 0.3s ease; padding-bottom: 40px;}
+  .view.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .admin-only-section { display: none !important; }
+  body.is-admin .admin-only-section { display: block !important; }
+
+  .liquid-glass {
+    background: var(--surface);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glass);
+  }
+
+  /* ===================== HEADER ===================== */
+  .top-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 24px 16px;
+    position: sticky; top: 0; z-index: 50;
+    background: linear-gradient(to bottom, rgba(19,25,57,0.95), transparent);
+  }
+  .user-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,0,0,0.3); padding: 6px 16px 6px 6px;
+    border-radius: var(--radius-pill); border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px); cursor: pointer;
+  }
+  .user-avatar {
+    width: 32px; height: 32px; border-radius: 50%; 
+    background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
+    display: flex; align-items: center; justify-content: center; color: var(--text-dark); font-weight: 700;
+  }
+  .user-name { font-size: 13px; color: var(--text-main); font-family: var(--font-en); font-weight: 500;}
+  .icon-btn {
+    width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center; color: var(--text-main);
+    background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); cursor: pointer; transition: 0.2s;
+  }
+  .icon-btn:active { transform: scale(0.9); }
+
+  .title-section { padding: 0 24px; margin-bottom: 20px; }
+  .eyebrow { font-size: 13px; color: var(--primary-cyan); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.05em;}
+  .main-title { font-size: 32px; font-weight: 700; line-height: 1.2; }
+
+  /* ===================== HOME: CHIPS & SEARCH ===================== */
+  .search-box {
+    margin: 0 24px 20px; display: flex; align-items: center; gap: 12px;
+    background: rgba(0,0,0,0.2); padding: 14px 20px; border-radius: var(--radius-pill);
+    border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+  }
+  .search-box input {
+    background: transparent; border: none; color: var(--text-main); width: 100%; outline: none; font-family: var(--font-th); font-size: 15px;
+  }
+  .search-box input::placeholder { color: var(--text-muted); }
+
+  .chip-scroll {
+    display: flex; gap: 12px; padding: 0 24px; overflow-x: auto; margin-bottom: 24px;
+    scroll-snap-type: x mandatory;
+  }
+  .filter-chip {
+    padding: 10px 20px; border-radius: var(--radius-pill); font-size: 14px; font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: var(--text-muted);
+    white-space: nowrap; cursor: pointer; transition: 0.3s; scroll-snap-align: start; backdrop-filter: blur(8px);
+  }
+  .filter-chip.active { background: var(--primary-cyan); color: var(--text-dark); border-color: var(--primary-cyan); font-weight: 600;}
+
+  /* ===================== HOME: CARDS ===================== */
+  .card-list { padding: 0 24px 40px; display: flex; flex-direction: column; gap: 20px; }
+  .eq-card {
+    border-radius: var(--radius-xl); padding: 24px;
+    display: flex; flex-direction: column; position: relative;
+    cursor: pointer; transition: transform 0.2s;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .eq-card:active { transform: scale(0.98); }
   
-  .nav-pill{
-    display:flex; align-items:center; gap:4px;
-    background:var(--surface); border:1.5px solid var(--line-strong);
-    border-radius:var(--radius-pill); padding:5px; margin-left:-16px; padding-left:24px;
-    box-shadow:var(--shadow-1); overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
-  }
-  .nav-pill::-webkit-scrollbar{display:none;}
+  .eq-card:nth-child(odd) { background: linear-gradient(145deg, #7e56eb, var(--primary-purple)); color: var(--text-main); }
+  .eq-card:nth-child(even) { background: linear-gradient(145deg, #0ba380, var(--primary-cyan)); color: var(--text-dark); }
+  .eq-card:nth-child(3n) { background: linear-gradient(145deg, #4b5563, #1e293b); color: var(--text-main); }
   
-  .pill {
-    border:none; background:transparent; color:var(--ink-soft);
-    font-family:var(--font-display); font-weight:600; font-size:14.5px;
-    padding:10px 18px; border-radius:var(--radius-pill); cursor:pointer;
-    white-space:nowrap; position: relative; overflow: hidden;
+  .card-badge {
+    position: absolute; top: 24px; right: 24px;
+    background: var(--bg-dark-1); color: var(--text-main);
+    padding: 6px 14px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
-  .pill .hover-circle {
-    position: absolute; left: 50%; bottom: 0; border-radius: 50%; background: var(--ink);
-    z-index: 1; pointer-events: none; will-change: transform;
+  .eq-card h3 { font-size: 24px; width: 70%; margin-top: 10px; line-height: 1.2; }
+  .eq-card p { font-size: 13.5px; opacity: 0.9; margin-top: 8px; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+  .card-img-container {
+    height: 180px; margin-top: 24px; border-radius: var(--radius-lg); overflow: hidden;
+    background: rgba(0,0,0,0.2); box-shadow: inset 0 4px 10px rgba(0,0,0,0.2);
   }
-  .pill .label-stack { position: relative; display: inline-block; line-height: 1; z-index: 2; }
-  .pill .pill-label { position: relative; display: inline-block; line-height: 1; z-index: 2; will-change: transform; }
-  .pill .pill-label-hover { position: absolute; left: 0; top: 0; color: var(--bg); z-index: 3; display: inline-block; will-change: transform, opacity; opacity: 0; }
-  .pill.active { background: var(--ink); color: var(--bg); }
-  .pill.active .hover-circle { display: none !important; }
-  .pill.active .pill-label { opacity: 0 !important; }
-  .pill.active .pill-label-hover { opacity: 1 !important; transform: translate(0, 0) !important; color: inherit; }
-
-  .admin-only { display: none !important; }
-  body.is-admin .admin-only { display: inline-flex !important; }
-
-  .theme-switch{
-    position: absolute; right: 0; display:flex; align-items:center; gap:3px;
-    background:var(--surface); border:1.5px solid var(--line-strong);
-    border-radius:var(--radius-pill); padding:4px; box-shadow:var(--shadow-1);
-  }
-  .theme-btn{
-    border:none; background:transparent; color:var(--ink-soft); width:36px; height:36px; border-radius:50%; cursor:pointer;
-    display:flex; align-items:center; justify-content:center; transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
-  }
-  .theme-btn svg{width:17px; height:17px;}
-  .theme-btn:hover{color:var(--ink);}
-  .theme-btn.active{background:var(--ink); color:var(--bg);}
-
-  @media (max-width:720px){
-    .bar{ flex-direction:column; align-items:stretch; justify-content: flex-start; }
-    .brand-row{ align-self:center; }
-    .nav-pill{margin-left:0; padding-left:5px; width:100%;}
-    .theme-switch{ position: static; align-self:center; margin-top: 8px; }
+  .card-img-container img { width: 100%; height: 100%; object-fit: cover; }
+  .card-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .card-icon {
+    width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.2); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
   }
 
-  /* ===================== Stats & Sections ===================== */
-  .stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:34px; }
-  .stat-card{ background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-lg); padding:18px 20px; position:relative; overflow:hidden; }
-  .stat-card .num{font-family:var(--font-display); font-size:clamp(26px,3vw,34px); font-weight:700;}
-  .stat-card .label{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+  /* ===================== BOTTOM NAV ===================== */
+  .bottom-nav {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: rgba(19, 25, 57, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 8px; border-radius: var(--radius-pill); border: 1px solid rgba(255,255,255,0.1);
+    width: 90%; max-width: 400px; z-index: 50; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  }
+  .nav-item {
+    width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative;
+  }
+  .nav-item.active { background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple)); color: var(--text-dark); box-shadow: 0 4px 12px rgba(17, 229, 180, 0.3); }
+  .nav-item svg { width: 22px; height: 22px; }
 
-  section.view{padding:8px 0 60px; display:none;}
-  section.view.active{display:block; animation:fadeUp 420ms var(--ease);}
-  @keyframes fadeUp{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+  /* ===================== FULL SCREEN DETAILS MODAL ===================== */
+  .modal-full {
+    position: fixed; top: 0; left: 50%; transform: translateX(-50%) translateY(100%);
+    width: 100%; max-width: 560px; height: 100%;
+    background: var(--bg-dark-1); z-index: 100;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex; flex-direction: column; opacity: 0; pointer-events: none;
+  }
+  .modal-full.open { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
   
-  .section-head{margin:44px 0 18px; display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap;}
-  .section-head h2{font-size:clamp(21px,2.6vw,28px);}
-  .section-head .sub{color:var(--ink-soft); font-size:14px; max-width:60ch;}
-
-  /* ===================== Filters & Grids ===================== */
-  .filter-bar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:20px 0 22px;}
-  .search-box{
-    display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line-strong);
-    border-radius:var(--radius-pill); padding:10px 16px; flex:1 1 220px; min-width:180px;
-  }
-  .search-box svg{width:16px; height:16px; color:var(--ink-faint); flex:none;}
-  .search-box input{ border:none; background:transparent; outline:none; color:var(--ink); font-family:var(--font-body); font-size:14px; width:100%; }
-  .search-box input::placeholder{color:var(--ink-faint);}
-  .chip-row{display:flex; gap:8px; flex-wrap:wrap;}
-  .chip{
-    border:1.5px solid var(--line-strong); background:var(--surface); color:var(--ink-soft); font-size:13px; font-weight:600;
-    padding:8px 15px; border-radius:var(--radius-pill); cursor:pointer; white-space:nowrap; transition:all var(--dur) var(--ease);
-  }
-  .chip:hover{color:var(--ink); border-color:var(--ink);}
-  .chip.active{background:var(--ink); color:var(--bg); border-color:var(--ink);}
-
-  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;}
-  .tag-card{
-    display:flex; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-lg); overflow:hidden;
-    position:relative; transition:border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
-  }
-  .tag-card:hover{border-color:var(--line-strong); transform:translateY(-2px);}
-  .tag-stub{
-    flex:0 0 76px; background:var(--surface-2); border-right:2px dashed var(--line-strong);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:14px 6px; position:relative;
-  }
-  .tag-stub::before{
-    content:''; position:absolute; top:-9px; left:50%; transform:translateX(-50%); width:18px; height:18px; border-radius:50%; background:var(--bg); border:1.5px solid var(--line-strong);
-  }
-  .tag-stub .icon{color:var(--ink); width:26px; height:26px;}
-  .tag-stub .aid{ font-family:var(--font-display); font-size:11px; font-weight:700; color:var(--ink-faint); writing-mode:vertical-rl; letter-spacing:.05em; }
-  .tag-body{flex:1; padding:16px 16px 14px; display:flex; flex-direction:column; gap:8px; min-width:0;}
-  .tag-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
-  .tag-body h3{font-size:16px; line-height:1.3;}
-  .status-chip{ font-size:11px; font-weight:700; padding:4px 10px; border-radius:var(--radius-pill); white-space:nowrap; flex:none; }
-  .status-chip.available{background:var(--chip-avail-bg); color:var(--chip-avail-ink);}
-  .status-chip.busy{background:var(--chip-busy-bg); color:var(--chip-busy-ink);}
-  .status-chip.maintenance{background:var(--chip-maint-bg); color:var(--chip-maint-ink);}
-  .tag-meta{font-size:12.5px; color:var(--ink-soft); line-height:1.5;}
-  .tag-foot{margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:8px; padding-top:6px;}
-  .tag-cat{font-size:11.5px; color:var(--ink-faint); font-weight:600;}
-
-  /* ===================== My bookings / Calendar ===================== */
-  .user-bar{
-    background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-lg);
-    padding:18px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:22px;
-  }
-  .field{display:flex; flex-direction:column; gap:6px;}
-  .field label{font-size:12px; font-weight:600; color:var(--ink-soft);}
-  .field input, .field select, .field textarea{
-    background:var(--surface-2); border:1.5px solid var(--line); border-radius:var(--radius-sm);
-    padding:11px 13px; font-family:var(--font-body); font-size:14px; color:var(--ink); outline:none; transition:border-color var(--dur) var(--ease); width: 100%;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--ink);}
-  .field textarea{resize:vertical; min-height:64px;}
-
-  .booking-row{
-    display:flex; gap:14px; align-items:stretch; background:var(--surface);
-    border:1.5px solid var(--line); border-radius:var(--radius-lg); padding:16px; margin-bottom:12px; flex-wrap:wrap;
-  }
-  .booking-row .b-main{flex:1 1 220px; min-width:0;}
-  .booking-row h4{font-size:15px; margin-bottom:4px;}
-  .booking-row .b-meta{font-size:12.5px; color:var(--ink-soft); line-height:1.6;}
-  .booking-row .b-actions{display:flex; align-items:center; gap:8px; flex:none;}
-  .btn-danger{background:var(--danger); color:var(--danger-ink); border:none; border-radius:var(--radius-pill); font-family:var(--font-display); font-weight:600; font-size:13px; padding:9px 16px; cursor:pointer;}
-
-  .schedule-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
-  .cal-btn {
-    width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--line);
-    display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-1); color: var(--ink);
-  }
-  .sync-row { display: flex; align-items: center; gap: 12px; margin: 16px 0 32px; font-size: 13.5px; color: var(--ink-soft); font-weight: 500; }
-  .sync-icons { display: flex; gap: 6px; }
-  .sync-icons .icon-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--surface-2); }
+  .details-content { flex: 1; overflow-y: auto; padding-bottom: 120px; position: relative; }
   
-  .cal-title { font-size: 26px; margin-bottom: 8px; }
-  .cal-subtitle { font-size: 20px; margin-bottom: 16px; margin-top: 32px; }
-
-  .cal-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
-  .cal-stat-box { background: var(--surface); border-radius: 16px; padding: 20px 16px; box-shadow: var(--shadow-1); border: 1.5px solid var(--line); }
-  .cal-stat-box .val { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-  .cal-stat-box .lbl { font-size: 13px; color: var(--ink-soft); }
-
-  .cal-grid-wrapper { margin-bottom: 40px; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px 0; text-align: center; font-size: 14.5px; font-weight: 600; margin-top: 16px; }
-  .cal-day { height: 44px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; color: var(--ink-faint); margin: 0; }
-  .cal-day.span-single { border-radius: 24px; }
-  .cal-bg-blue { background-color: #3855F6 !important; color: #FFF !important; }
+  .det-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 24px; position: absolute; top: 0; width: 100%; z-index: 10;
+  }
+  .det-hero {
+    width: 100%; height: 420px; background: var(--primary-purple);
+    border-bottom-left-radius: 48px; border-bottom-right-radius: 48px;
+    padding-top: 80px; position: relative; transition: background 0.4s;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .det-hero img { width: 100%; height: 100%; object-fit: cover; border-bottom-left-radius: 48px; border-bottom-right-radius: 48px; opacity: 0.85; mix-blend-mode: multiply; }
   
-  .cal-legend { display: flex; flex-wrap: wrap; gap: 16px 20px; margin-top: 24px; font-size: 13px; }
-  .legend-item { display: flex; align-items: center; gap: 8px; color: var(--ink-soft); font-weight: 500; }
-  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
-  .legend-dot.blue { background: #3855F6; }
+  .det-body { padding: 24px; margin-top: -50px; position: relative; z-index: 2; text-align: center; }
+  .det-tag {
+    display: inline-block; background: var(--bg-dark-1); color: var(--text-main);
+    padding: 8px 20px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 600; margin-bottom: 24px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .stats-row { display: flex; justify-content: space-between; padding: 20px; margin-bottom: 24px; }
+  .stat-col { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 33%; }
+  .stat-val { font-size: 18px; font-weight: 700; color: var(--text-main); font-family: var(--font-en); text-align: center;}
+  .stat-lbl { font-size: 12px; color: var(--text-muted); }
 
-  .admin-table-wrapper { overflow-x: auto; background: var(--surface); border-radius: var(--radius-lg); border: 1.5px solid var(--line); margin-top: 16px; }
+  .about-box { padding: 24px; text-align: left; margin-bottom: 20px;}
+  .about-box h4 { 
+    text-align: center; background: var(--primary-cyan); color: var(--text-dark); 
+    display: inline-block; padding: 6px 16px; border-radius: var(--radius-pill); 
+    font-size: 13px; margin-bottom: 16px; position: relative; left: 50%; transform: translateX(-50%); 
+  }
+  .about-box p { font-size: 14.5px; color: var(--text-muted); line-height: 1.6; }
+
+  .btn-bottom-fixed {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    width: 85%; max-width: 400px; background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple)); 
+    color: var(--text-dark); border: none; padding: 18px; border-radius: var(--radius-pill);
+    font-size: 16px; font-weight: 700; font-family: var(--font-en); cursor: pointer; z-index: 101;
+    box-shadow: 0 10px 24px rgba(17, 229, 180, 0.3); transition: 0.2s;
+  }
+  .btn-bottom-fixed:active { transform: translateX(-50%) scale(0.96); }
+
+  /* ===================== BOOKING BOTTOM SHEET ===================== */
+  .sheet-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+    z-index: 200; opacity: 0; pointer-events: none; transition: 0.3s;
+  }
+  .sheet-overlay.open { opacity: 1; pointer-events: auto; }
+  
+  .bottom-sheet {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%);
+    width: 100%; max-width: 560px; background: var(--surface-solid);
+    border-top-left-radius: 40px; border-top-right-radius: 40px;
+    padding: 24px 16px 40px; z-index: 201; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    max-height: 95vh; overflow-y: auto; box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+  }
+  .bottom-sheet.open { transform: translateX(-50%) translateY(0); }
+
+  .sheet-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 0 8px;}
+  .sheet-header h2 { font-size: 18px; font-weight: 500; font-family: var(--font-en); flex: 1; text-align: center; margin-right: 36px;}
+
+  .bk-item-card {
+    background: rgba(255,255,255,0.03); border-radius: var(--radius-lg); padding: 12px 16px;
+    display: flex; align-items: center; gap: 16px; margin: 0 8px 16px; border: 1px solid rgba(255,255,255,0.05);
+  }
+  .bk-item-img { width: 50px; height: 50px; border-radius: 12px; background: var(--primary-purple); overflow: hidden; }
+  .bk-item-img img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; }
+  .bk-item-info h4 { font-size: 15px; margin-bottom: 4px; }
+  .bk-item-info p { font-size: 12px; color: var(--primary-cyan); }
+
+  .input-row { display: flex; gap: 12px; margin: 0 8px 24px; }
+  .input-dark {
+    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+    padding: 14px; border-radius: var(--radius-md); color: var(--text-main);
+    font-family: inherit; font-size: 14px; outline: none; transition: 0.2s;
+  }
+  .input-dark:focus { border-color: var(--primary-purple-light); }
+
+  /* ===================== THE RADIAL DIAL UI ===================== */
+  .dial-wrapper {
+    position: relative;
+    background: var(--dial-bg);
+    border-radius: 40px;
+    padding-top: 24px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    height: 380px; 
+    box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .dial-wrapper::before {
+    content: ''; position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%);
+    width: 450px; height: 450px; border-radius: 50%;
+    background: var(--dial-bg-inner);
+    z-index: 0; box-shadow: 0 -10px 20px rgba(0,0,0,0.3);
+  }
+
+  .scroll-track {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+    scrollbar-width: none; position: relative; z-index: 2;
+    align-items: flex-start;
+  }
+  .scroll-track::-webkit-scrollbar { display: none; }
+  
+  /* Date Track */
+  #date-track { height: 160px; padding: 0 calc(50% - 38px); }
+  .date-item {
+    flex: 0 0 76px; height: 96px; background: #3a3a3c; border-radius: 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #a1a1aa; scroll-snap-align: center; margin: 0 6px;
+    /* เปลี่ยนมารองรับ JS ควบคุมล้วนๆ ตัดเรื่อง transform ออกจาก transition เพื่อป้องกันการสั่น */
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, opacity 0.2s;
+    opacity: 0.6;
+    will-change: transform;
+  }
+  .date-item.active { 
+    background: #ffffff; color: #000000; box-shadow: 0 10px 20px rgba(255,255,255,0.2); 
+    opacity: 1;
+  }
+  .date-item .dt-icon { width: 14px; height: 14px; margin-bottom: 4px; opacity: 0.7; }
+  .date-item .dt-top { font-size: 12px; margin-bottom: 2px; font-weight: 500; font-family: var(--font-en);}
+  .date-item .dt-bot { font-size: 22px; font-weight: 800; font-family: var(--font-en); }
+
+  /* Time Track */
+  #time-track { height: 80px; margin-top: -10px; padding: 0 calc(50% - 40px); }
+  .time-item {
+    flex: 0 0 80px; height: 60px; background: transparent; border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #a1a1aa; scroll-snap-align: center; margin: 0 4px;
+    /* ตัด transform ออกจาก transition เพื่อให้เลื่อนเนียนเป็นครึ่งวงกลม */
+    transition: color 0.2s, opacity 0.2s;
+    opacity: 0.6;
+    will-change: transform;
+  }
+  .time-item.active { 
+    color: var(--text-dark); font-weight: 700; position: relative; z-index: 3;
+    opacity: 1;
+  }
+  .time-item .tm-val { font-size: 15px; font-family: var(--font-en); margin-bottom: 2px;}
+  .time-item .tm-ampm { font-size: 11px; font-weight: 600; font-family: var(--font-en);}
+
+  /* The Purple Wedge for active time */
+  .time-wedge {
+    position: absolute; bottom: 122px; left: 50%; transform: translateX(-50%);
+    width: 70px; height: 50px; background: var(--primary-purple-light);
+    clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
+    border-radius: 6px; z-index: 1; pointer-events: none;
+  }
+  .time-wedge::before {
+    content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    border-left: 6px solid transparent; border-right: 6px solid transparent;
+    border-bottom: 6px solid var(--primary-purple-light);
+  }
+
+  /* Big Circular Confirm Button inside Dial */
+  .btn-circle-confirm {
+    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+    width: 64px; height: 64px; border-radius: 50%; background: var(--primary-purple-light);
+    color: var(--text-dark); display: flex; align-items: center; justify-content: center;
+    border: none; cursor: pointer; z-index: 10;
+    box-shadow: 0 10px 20px rgba(181, 160, 255, 0.3); transition: 0.2s;
+  }
+  .btn-circle-confirm:active { transform: translateX(-50%) scale(0.92); }
+  .btn-circle-confirm svg { width: 28px; height: 28px; }
+
+  /* End Time Input */
+  .end-time-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 0 24px 20px; padding: 12px 20px; background: rgba(0,0,0,0.3);
+    border-radius: var(--radius-pill); border: 1px solid rgba(255,255,255,0.1);
+  }
+  .end-time-row label { font-size: 14px; color: var(--text-main); font-weight: 500;}
+  .end-time-input {
+    background: transparent; border: none; color: var(--primary-cyan);
+    font-size: 16px; font-weight: 700; font-family: var(--font-en); outline: none; width: 100px; text-align: right;
+  }
+  
+  .err-msg { color: var(--danger); font-size: 13px; text-align: center; min-height: 18px; margin-bottom: 10px; }
+
+  /* ===================== CALENDAR VIEW ===================== */
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 24px 24px; }
+  .stat-box { padding: 20px; text-align: center; }
+  .stat-box .val { font-size: 28px; font-weight: 700; color: var(--primary-cyan); font-family: var(--font-en); margin-bottom: 4px; }
+  .stat-box .lbl { font-size: 13px; color: var(--text-muted); }
+
+  .cal-container { margin: 0 24px; padding: 24px; }
+  .cal-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px 8px; text-align: center; }
+  .cal-day-name { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+  .cal-day {
+    height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 12px; font-size: 14px; font-family: var(--font-en); cursor: pointer; transition: 0.2s; position: relative;
+  }
+  .cal-day:hover { background: rgba(255,255,255,0.1); }
+  .cal-day.has-booking { color: var(--primary-purple-light); font-weight: 700; }
+  .cal-day.has-booking::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; border-radius: 50%; background: var(--primary-purple-light); }
+  .cal-day.active { background: var(--primary-purple-light) !important; color: var(--text-dark) !important; font-weight: 700; }
+  .cal-day.active::after { background: var(--text-dark); }
+  
+  .day-details { margin: 24px 24px 0; padding: 20px; min-height: 120px; }
+
+  /* ===================== MY BOOKINGS & ADMIN ===================== */
+  .bk-card {
+    padding: 20px; margin-bottom: 16px; position: relative;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .bk-card h4 { font-size: 18px; color: var(--primary-cyan); margin-bottom: 10px; }
+  .bk-meta { font-size: 13.5px; color: var(--text-main); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;}
+  .bk-meta span.lbl { color: var(--text-muted); width: 40px; }
+  .bk-countdown { 
+    display: inline-block; padding: 6px 14px; border-radius: var(--radius-pill); 
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
+    font-size: 12.5px; margin-top: 12px; font-weight: 500;
+  }
+
+  .admin-table-wrapper { overflow-x: auto; margin: 0 24px; border: 1px solid rgba(255,255,255,0.05); }
   .admin-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-  .admin-table th, .admin-table td { padding: 14px 16px; text-align: left; border-bottom: 1.5px solid var(--line); font-size: 14px; }
-  .admin-table th { background: var(--surface-2); font-weight: 600; color: var(--ink-soft); }
-  .admin-table tr:last-child td { border-bottom: none; }
-  .admin-table tbody tr:hover { background: var(--surface-2); }
+  .admin-table th, .admin-table td { padding: 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+  .admin-table th { background: rgba(0,0,0,0.3); color: var(--text-muted); font-weight: 500; }
+  .btn-danger-text { background: rgba(255,92,122,0.1); color: var(--danger); border: none; font-size: 12px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: 0.2s;}
+  .btn-danger-text:active { transform: scale(0.95); }
 
-  /* ===================== Custom Modal Details & Booking (App Style) ===================== */
-  .modal-overlay{
-    position:fixed; inset:0; background:rgba(10,10,15,.65); backdrop-filter:blur(4px);
-    display:none; align-items:center; justify-content:center; padding:0; z-index:100;
+  /* ===================== TOAST ===================== */
+  .toast {
+    position: fixed; top: 40px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: var(--text-main); color: var(--bg-dark-1); padding: 14px 28px;
+    border-radius: var(--radius-pill); font-size: 14px; font-weight: 700;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 9999; text-align: center; white-space: nowrap;
   }
-  .modal-overlay.open{display:flex; animation:fadeIn 250ms var(--ease);}
-  @keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
-  
-  .modal-details {
-    background:var(--surface); width:100%; max-width:480px; height:100%; max-height:100vh;
-    display:flex; flex-direction:column; position:relative; overflow:hidden;
-    animation:slideUp 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-  @media (min-width: 481px) {
-    .modal-details { height: 90vh; border-radius: 32px; box-shadow: var(--shadow-2); border: 1.5px solid var(--line); }
-  }
-  @keyframes slideUp{from{opacity:0; transform:translateY(40px);} to{opacity:1; transform:translateY(0);}}
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* Modal Header (App-like) */
-  .md-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 24px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;
-  }
-  .md-back-btn, .md-fav-btn {
-    width: 44px; height: 44px; border-radius: 50%; background: var(--surface); color: var(--ink);
-    display: flex; align-items: center; justify-content: center; border: none; cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s;
-  }
-  .md-back-btn:active, .md-fav-btn:active { transform: scale(0.95); }
-  
-  /* Scrollable Body */
-  .md-body {
-    flex: 1; overflow-y: auto; padding-bottom: 120px; /* Space for bottom bar */
-  }
-  
-  /* Product Image */
-  .md-image-container {
-    width: 100%; height: 320px; background: var(--surface-2); position: relative;
-  }
-  .md-image {
-    width: 100%; height: 100%; object-fit: cover; object-position: center;
-  }
-  
-  /* Content Info */
-  .md-info { padding: 24px; }
-  .md-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap:12px; }
-  .md-title-row h2 { font-size: 24px; line-height: 1.2; }
-  .md-cat-badge {
-    background: var(--surface-2); color: var(--ink-soft); font-size: 12px; font-weight: 600;
-    padding: 6px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 16px;
-  }
-  .md-desc { font-size: 14.5px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 24px; }
-  
-  /* Rules/Warnings Box */
-  .md-rules-box {
-    background: var(--warning-bg); border: 1.5px solid var(--warning-ink); border-radius: var(--radius-md);
-    padding: 16px; margin-bottom: 24px;
-  }
-  .md-rules-title { font-size: 14px; font-weight: 700; color: var(--warning-ink); margin-bottom: 8px; display: flex; align-items: center; gap:6px;}
-  .md-rules-list { margin: 0; padding-left: 20px; font-size: 13.5px; color: var(--ink); line-height: 1.6; }
-  .md-rules-list li { margin-bottom: 4px; }
-
-  /* Section Titles */
-  .md-section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; font-family: var(--font-display); }
-
-  /* Form Layout */
-  .md-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .md-form-grid .full { grid-column: 1 / -1; }
-  
-  /* Advance Booking Warning */
-  .advance-badge {
-    display: none; background: #3855F6; color: #FFF; font-size: 12px; font-weight: 600;
-    padding: 6px 12px; border-radius: 8px; margin-bottom: 16px; text-align: center;
-    animation: pop 0.2s var(--ease);
-  }
-  @keyframes pop{from{opacity:0; transform:scale(0.95);} to{opacity:1; transform:scale(1);}}
-  
-  /* Fixed Bottom Bar */
-  .md-bottom-bar {
-    position: absolute; bottom: 0; left: 0; right: 0; background: var(--surface);
-    padding: 20px 24px; border-top: 1.5px solid var(--line); box-shadow: var(--shadow-up);
-    display: flex; align-items: center; justify-content: space-between; z-index: 10;
-  }
-  .md-price-box { display: flex; flex-direction: column; }
-  .md-price-lbl { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
-  .md-price-val { font-size: 22px; font-weight: 800; font-family: var(--font-display); }
-  .md-btn-book {
-    background: var(--ink); color: var(--bg); border: none; padding: 14px 32px;
-    border-radius: var(--radius-pill); font-family: var(--font-display); font-size: 16px; font-weight: 600;
-    cursor: pointer; box-shadow: 0 8px 16px rgba(10,10,15,0.15); transition: transform 0.2s, background 0.2s;
-  }
-  html[data-theme="colorful"] .md-btn-book { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink); }
-  .md-btn-book:active { transform: scale(0.96); }
-  .md-btn-book:disabled { background: var(--line-strong); cursor: not-allowed; transform: none; box-shadow: none; color: var(--ink-faint); }
-
-  /* Error msg */
-  .form-err { font-size: 13px; color: var(--danger); text-align: right; min-height: 18px; font-weight: 500; }
-
-  /* Toast */
-  .toast{
-    position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px);
-    background:var(--ink); color:var(--bg); padding:13px 22px; border-radius:var(--radius-pill);
-    font-size:14px; font-weight:600; box-shadow:var(--shadow-2); opacity:0; pointer-events:none;
-    transition:all 260ms var(--ease); z-index:200; display:flex; align-items:center; gap:8px;
-  }
-  html[data-theme="colorful"] .toast{background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:var(--accent-ink);}
-  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
-  
-  footer{padding:30px 0 50px; text-align:center; color:var(--ink-faint); font-size:12.5px;}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main"></a>
 
-<header class="topbar">
-  <div class="wrap">
-    <div class="bar">
-      <div class="logo-mark" aria-hidden="true">
-<img src="lo.png" alt="Logo">
-</div>
-        <nav class="nav-pill" role="tablist" aria-label="เมนูหลัก">
-          <button class="pill active" data-view="home" role="tab" aria-selected="true">
-            <span class="hover-circle" aria-hidden="true"></span>
-            <span class="label-stack"><span class="pill-label">หน้าหลัก</span><span class="pill-label-hover" aria-hidden="true">หน้าหลัก</span></span>
-          </button>
-          <button class="pill" data-view="equipment" role="tab" aria-selected="false">
-            <span class="hover-circle" aria-hidden="true"></span>
-            <span class="label-stack"><span class="pill-label">อุปกรณ์</span><span class="pill-label-hover" aria-hidden="true">อุปกรณ์</span></span>
-          </button>
-          <button class="pill" data-view="bookings" role="tab" aria-selected="false">
-            <span class="hover-circle" aria-hidden="true"></span>
-            <span class="label-stack"><span class="pill-label">การจองของฉัน</span><span class="pill-label-hover" aria-hidden="true">การจองของฉัน</span></span>
-          </button>
-          <button class="pill admin-only" data-view="admin" role="tab" aria-selected="false">
-            <span class="hover-circle" aria-hidden="true"></span>
-            <span class="label-stack"><span class="pill-label">แอดมิน</span><span class="pill-label-hover" aria-hidden="true">แอดมิน</span></span>
-          </button>
-        </nav>
+<div class="app-container">
+  
+  <!-- ================= VIEW: HOME ================= -->
+  <div id="view-home" class="view active">
+    <header class="top-header">
+      <div class="user-pill" onclick="promptAdmin()">
+        <div class="user-avatar" id="avatar-initial">P</div>
+        <span class="user-name" id="display-username">พนักงาน</span>
       </div>
-      <div class="theme-switch" role="group" aria-label="เลือกธีม">
-        <button class="theme-btn" data-theme-btn="light" title="โหมดสว่าง" aria-label="โหมดสว่าง"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg></button>
-        <button class="theme-btn" data-theme-btn="dark" title="โหมดมืด" aria-label="โหมดมืด"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.2A8.4 8.4 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2z"/></svg></button>
-        <button class="theme-btn" data-theme-btn="colorful" title="โหมดสีสัน" aria-label="โหมดสีสัน"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 1.9-.9 1.9-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.7-1.6 1.6-1.6h1.7A4.3 4.3 0 0 0 20.5 11 8.6 8.6 0 0 0 12 3z"/><circle cx="7.5" cy="10.5" r=".9" fill="currentColor" stroke="none"/><circle cx="11" cy="7.3" r=".9" fill="currentColor" stroke="none"/><circle cx="15.2" cy="8.2" r=".9" fill="currentColor" stroke="none"/></svg></button>
+      <button class="icon-btn" onclick="showToast('การแจ้งเตือนไม่มีข้อความใหม่')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+      </button>
+    </header>
+
+    <div class="title-section">
+      <div class="eyebrow">Work Equipment, Your Way</div>
+      <h1 class="main-title">Find Top Class<br>Equipment</h1>
+    </div>
+
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="search-input" placeholder="ค้นหาชื่ออุปกรณ์...">
+    </div>
+
+    <div class="chip-scroll" id="cat-filters"></div>
+    <div class="card-list" id="equipment-list"></div>
+  </div>
+
+  <!-- ================= VIEW: CALENDAR ================= -->
+  <div id="view-calendar" class="view">
+    <header class="top-header"><h1 style="font-size: 24px;">ปฏิทินคิวจอง</h1></header>
+    <div class="stats-grid" id="cal-stats"></div>
+    <div class="cal-container liquid-glass">
+      <div class="cal-header-row"><h3 id="cal-month-year" style="font-size: 18px; color: var(--primary-cyan);">Month</h3></div>
+      <div class="cal-grid" id="visual-calendar"></div>
+    </div>
+    <div class="day-details liquid-glass" id="day-booking-details"></div>
+  </div>
+
+  <!-- ================= VIEW: MY BOOKINGS ================= -->
+  <div id="view-bookings" class="view">
+    <header class="top-header"><h1 style="font-size: 24px;">การจองของฉัน</h1></header>
+    <div style="padding: 0 24px;">
+      <div style="margin-bottom: 32px;" class="liquid-glass">
+        <div style="padding: 20px;">
+          <label style="font-size:13px; color:var(--text-muted); display:block; margin-bottom:12px;">ข้อมูลพนักงาน (ใช้ค้นหาและจองอัตโนมัติ)</label>
+          <input type="text" id="user-name" class="input-dark" placeholder="ชื่อ - นามสกุล" style="width:100%; margin:0 0 12px 0;">
+          <input type="text" id="user-dept" class="input-dark" placeholder="แผนก / ตำแหน่ง" style="width:100%; margin:0;">
+        </div>
       </div>
+      <h3 style="font-size: 16px; margin: 0 0 16px; color: var(--primary-cyan);">รายการจองของคุณ</h3>
+      <div id="my-bookings-list"></div>
     </div>
   </div>
-</header>
 
-<div class="wrap site-intro">
-  <h2>ระบบยืม-คืนอุปกรณ์ส่วนกลาง</h2>
-  <p>เว็บไซต์นี้ถูกสร้างขึ้นมาเพื่อช่วยให้พนักงานสามารถเช็กคิวว่าง จองอุปกรณ์ล่วงหน้า และติดตามสถานะการจองได้ด้วยตัวเองแบบเรียลไทม์ ลดปัญหาการจองซ้ำซ้อน และประหยัดเวลาในการติดต่อประสานงาน</p>
-</div>
-
-<main id="main" class="wrap">
-
-  <!-- ================= HOME ================= -->
-  <section class="view active" id="view-home">
-    <div class="hero">
-      <span class="eyebrow"><span class="dot"></span>ระบบจองอุปกรณ์ภายในบริษัท</span>
-      <h1>เช็กของว่าง จอง<br>แล้ว<span class="accent-word">รับของได้เลย</span></h1>
-      <p class="lead">ดูสถานะอุปกรณ์ทุกชิ้นแบบเรียลไทม์ จองล่วงหน้าได้ในไม่กี่ขั้นตอน ไม่ต้องโทรถามแผนกไอทีหรือธุรการอีกต่อไป</p>
-      <div class="hero-cta">
-        <button class="btn btn-primary" data-goto="equipment">ดูอุปกรณ์ทั้งหมด</button>
-        <button class="btn btn-ghost" data-goto="bookings">การจองของฉัน</button>
-      </div>
-      <div class="stats" id="stats-row"></div>
+  <!-- ================= BOTTOM NAVIGATION ================= -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </div>
-
-    <div class="section-head"><div><h2>วิธีใช้งาน</h2><p class="sub">สามขั้นตอนง่าย ๆ ตั้งแต่เลือกของจนถึงรับของจริง</p></div></div>
-    <div class="steps">
-      <div class="step"><div class="n">1</div><h3>เลือกอุปกรณ์</h3><p>ค้นหาหรือกรองตามหมวดหมู่ ดูสถานะว่างได้ทันทีจากป้ายสี</p></div>
-      <div class="step"><div class="n">2</div><h3>เลือกวันและเวลา</h3><p>ระบบจะโชว์ข้อมูลอุปกรณ์อย่างละเอียด เลือกเวลาแล้วกดยืนยัน</p></div>
-      <div class="step"><div class="n">3</div><h3>รับอุปกรณ์ตามนัด</h3><p>ติดตามสถานะการจองทั้งหมดได้ที่แท็บ "การจองของฉัน" ยกเลิกได้ทุกเมื่อ</p></div>
+    <div class="nav-item" data-tab="calendar" onclick="switchTab('calendar')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     </div>
-
-    <div class="section-head">
-      <div><h2>อุปกรณ์ที่ว่างตอนนี้</h2><p class="sub">ตัวอย่างบางส่วน กดดูทั้งหมดเพื่อเลือกและจอง</p></div>
-      <button class="btn btn-ghost btn-sm" data-goto="equipment">ดูทั้งหมด</button>
+    <div class="nav-item" data-tab="bookings" onclick="switchTab('bookings')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
     </div>
-    <div class="grid" id="home-preview"></div>
-  </section>
+  </nav>
 
-  <!-- ================= EQUIPMENT ================= -->
-  <section class="view" id="view-equipment">
-    <div class="section-head"><div><h2>อุปกรณ์ทั้งหมด</h2><p class="sub">ค้นหา กรองตามหมวดหมู่หรือสถานะ แล้วกดดูรายละเอียดเพื่อจอง</p></div></div>
-    <div class="filter-bar">
-      <div class="search-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="text" id="search-input" placeholder="ค้นหาชื่ออุปกรณ์ เช่น โน้ตบุ๊ก, กล้อง...">
-      </div>
-      <div class="chip-row" id="status-filter">
-        <button class="chip active" data-status="all">ทั้งหมด</button>
-        <button class="chip" data-status="available">ว่าง</button>
-        <button class="chip" data-status="busy">ถูกจองวันนี้</button>
-        <button class="chip" data-status="maintenance">ซ่อมบำรุง</button>
-      </div>
-    </div>
-    <div class="chip-row" id="cat-filter" style="margin-bottom:20px;"></div>
-    <div class="grid" id="equipment-grid"></div>
-  </section>
-
-  <!-- ================= BOOKINGS ================= -->
-  <section class="view" id="view-bookings">
-    <div class="schedule-header">
-      <button class="cal-btn" aria-label="กลับ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <button class="cal-btn" aria-label="ปฏิทิน"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></button>
-      <span id="cal-current-date"></span>
-    </div>
-
-    <h2 class="cal-title">Track your schedule</h2>
-    <div class="sync-row">
-      <div class="sync-icons">
-        <div class="icon-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></div>
-        <div class="icon-circle" style="background:#111; color:#fff; font-weight:bold; font-size:12px;">N</div>
-        <div class="icon-circle" style="background:#EAF3FF; color:#2D8CFF;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 7.5h10.5c.83 0 1.5.67 1.5 1.5v6c0 .83-.67 1.5-1.5 1.5H4.5C3.67 16.5 3 15.83 3 15v-6c0-.83.67-1.5 1.5-1.5zm12 1.8l3.6-2.7c.37-.28.9.02.9.45v9.9c0 .43-.53.73-.9.45l-3.6-2.7v-5.4z"/></svg></div>
-      </div>
-      <span>synced with Notion & Zoom</span>
-    </div>
-
-    <h3 class="cal-subtitle">สถิติการใช้งานจริง (ภาพรวม)</h3>
-    <div class="cal-stats-grid" id="real-stats-grid"></div>
-
-    <div class="cal-grid-wrapper">
-      <h3 class="cal-subtitle" style="margin-top:0;">ปฏิทินการจอง (Real-time)</h3>
-      <div class="cal-grid" id="visual-calendar" style="gap: 8px 0; margin-top: 16px;"></div>
-      <div id="day-booking-details" style="margin-top: 24px; padding: 16px; background: var(--surface-2); border-radius: var(--radius-lg); border: 1.5px solid var(--line); min-height: 80px; display:flex; flex-direction:column; justify-content:center;">
-        <p style="color: var(--ink-soft); font-size: 14px; text-align: center; margin:0;">คลิกที่วันที่ในปฏิทินด้านบน เพื่อดูรายละเอียดผู้ที่จองคิวไว้</p>
-      </div>
-      <div class="cal-legend">
-        <div class="legend-item"><div class="legend-dot blue"></div> มีการจองอุปกรณ์</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--surface-2); border:1px solid var(--line);"></div> ว่าง</div>
-      </div>
-    </div>
-    
-    <hr style="border:none; border-top:1.5px solid var(--line); margin: 40px 0;">
-
-    <div class="section-head" style="margin-top: 0;"><div><h2>ตรวจสอบการจองของคุณ</h2><p class="sub">กรอกชื่อของคุณเพื่อดูรายการอุปกรณ์ที่จองไว้</p></div></div>
-    <div class="user-bar">
-      <div class="field"><label for="user-name">ชื่อ-นามสกุล</label><input type="text" id="user-name" placeholder="เช่น บีม ใจดี"></div>
-      <div class="field"><label for="user-dept">แผนก</label><input type="text" id="user-dept" placeholder="เช่น การตลาด"></div>
-    </div>
-    <div id="bookings-list"></div>
-  </section>
-
-  <!-- ================= ADMIN DASHBOARD ================= -->
-  <section class="view admin-only-section" id="view-admin">
-    <div class="section-head">
-      <div><h2>ระบบจัดการหลังบ้าน (Admin)</h2><p class="sub">ดูข้อมูลการจองทั้งหมดในระบบ จัดการ และแก้ไข</p></div>
-      <button class="btn btn-ghost btn-sm" id="btn-logout-admin">ออกจากระบบแอดมิน</button>
-    </div>
-    <div class="stats" id="admin-stats-row"></div>
-    <div class="section-head" style="margin-top: 40px;"><h3>รายการจองทั้งหมด</h3></div>
-    <div class="admin-table-wrapper">
+  <!-- ================= VIEW: ADMIN DASHBOARD ================= -->
+  <div id="view-admin" class="view admin-only-section">
+    <header class="top-header">
+      <h1 style="font-size: 24px; color: var(--danger);">Admin Dashboard</h1>
+      <button class="btn-danger-text" onclick="logoutAdmin()">Logout</button>
+    </header>
+    <div class="stats-grid" id="admin-stats-row"></div>
+    <div class="title-section" style="margin-top: 16px;"><h3 style="font-size: 16px;">รายการจองทั้งหมดในระบบ</h3></div>
+    <div class="admin-table-wrapper liquid-glass">
       <table class="admin-table">
-        <thead>
-          <tr><th>รหัสการจอง</th><th>ผู้จอง (แผนก)</th><th>อุปกรณ์</th><th>วันที่-เวลาใช้งาน</th><th>จัดการ</th></tr>
-        </thead>
+        <thead><tr><th>ข้อมูลผู้จอง</th><th>อุปกรณ์</th><th>วัน-เวลา</th><th>จัดการ</th></tr></thead>
         <tbody id="admin-bookings-table"></tbody>
       </table>
     </div>
-  </section>
-</main>
-
-<!-- ================= App-Style Details & Booking Modal ================= -->
-<div class="modal-overlay" id="details-overlay">
-  <div class="modal-details" role="dialog" aria-modal="true" aria-labelledby="det-title">
-    
-    <!-- Top Nav -->
-    <div class="md-header">
-      <button class="md-back-btn" id="md-close-btn" aria-label="กลับ">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-      <button class="md-fav-btn" aria-label="รายการโปรด">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-      </button>
-    </div>
-
-    <!-- Scrollable Content -->
-    <div class="md-body">
-      <!-- Image Hero -->
-      <div class="md-image-container">
-        <img src="" alt="Equipment" class="md-image" id="det-img">
-      </div>
-
-      <!-- Info Section -->
-      <div class="md-info">
-        <div class="md-title-row">
-          <h2 id="det-title">Loading...</h2>
-          <span class="status-chip" id="det-status-chip" style="font-size:12px; padding:6px 12px;">ว่าง</span>
-        </div>
-        
-        <div class="md-cat-badge">
-          <span id="det-icon" style="display:flex; width:16px; height:16px;"></span>
-          <span id="det-cat">Category</span>
-          <span style="color:var(--line-strong);">|</span>
-          <span id="det-loc" style="font-weight:400;">Location</span>
-        </div>
-        
-        <p class="md-desc" id="det-desc">คำอธิบายอุปกรณ์จะแสดงที่นี่...</p>
-
-        <!-- Warnings / Rules -->
-        <div class="md-rules-box">
-          <div class="md-rules-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-            ข้อควรระวัง / การใช้งาน
-          </div>
-          <ul class="md-rules-list" id="det-rules">
-            <!-- Rules will be injected here -->
-          </ul>
-        </div>
-
-        <hr style="border:none; border-top:1.5px solid var(--line); margin: 32px 0;">
-
-        <!-- Booking Form Section -->
-        <h3 class="md-section-title">ระบุรายละเอียดการจอง</h3>
-        <form id="det-booking-form">
-          <div class="md-form-grid">
-            <div class="field full">
-              <label for="det-name">ชื่อ-นามสกุลผู้จอง *</label>
-              <input type="text" id="det-name" required placeholder="เช่น บีม ใจดี">
-            </div>
-            <div class="field full">
-              <label for="det-dept">แผนก *</label>
-              <input type="text" id="det-dept" required placeholder="เช่น การตลาด">
-            </div>
-          </div>
-
-          <!-- Dynamic Advance Booking Badge -->
-          <div class="advance-badge" id="advance-badge">📅 เป็นการจองล่วงหน้า</div>
-
-          <div class="md-form-grid" style="margin-bottom: 24px;">
-            <div class="field full">
-              <label for="det-date">วันที่ใช้งาน *</label>
-              <input type="date" id="det-date" required>
-            </div>
-            <div class="field">
-              <label for="det-start">เวลาเริ่ม *</label>
-              <input type="time" id="det-start" required>
-            </div>
-            <div class="field">
-              <label for="det-end">เวลาสิ้นสุด *</label>
-              <input type="time" id="det-end" required>
-            </div>
-            <div class="field full">
-              <label for="det-note">หมายเหตุ (ถ้ามี)</label>
-              <textarea id="det-note" placeholder="วัตถุประสงค์การใช้งาน..." style="min-height:50px;"></textarea>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Fixed Bottom Bar -->
-    <div class="md-bottom-bar">
-      <div class="md-price-box">
-        <span class="md-price-lbl">ค่าบริการ (พนักงาน)</span>
-        <span class="md-price-val">ฟรี</span>
-      </div>
-      <div>
-        <p class="form-err" id="det-err" style="margin-bottom:6px; margin-top:0;"></p>
-        <button type="button" class="md-btn-book" id="det-submit-btn">ยืนยันการจอง</button>
-      </div>
-    </div>
-
   </div>
+
 </div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!-- ================= FULL SCREEN DETAILS MODAL ================= -->
+<div class="modal-full" id="details-modal">
+  <div class="details-content">
+    <div class="det-header">
+      <button class="icon-btn" onclick="closeDetails()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div style="font-weight: 500;" id="det-header-title">Detail</div>
+      <button class="icon-btn" onclick="showToast('⭐ เพิ่มลงในรายการโปรดแล้ว')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </button>
+    </div>
 
-<footer>
-  ยืมด่วน · ระบบจองอุปกรณ์ภายในบริษัท · ข้อมูลถูกบันทึกไว้ในเบราว์เซอร์นี้เท่านั้น
-  <br><br>
-  <a href="#" id="admin-login-trigger" style="color:var(--ink-faint); text-decoration:none; font-size:11px;">สำหรับแอดมิน</a>
-</footer>
+    <div class="det-hero" id="det-bg"><img src="" id="det-img" alt=""></div>
+
+    <div class="det-body">
+      <div class="det-tag" id="det-cat">Category</div>
+      <h2 style="font-size: 28px; margin-bottom: 24px; line-height: 1.2;" id="det-title">Item Name</h2>
+
+      <div class="stats-row liquid-glass">
+        <div class="stat-col">
+          <span class="stat-val" id="det-stat-status">Available</span>
+          <span class="stat-lbl">Status</span>
+        </div>
+        <div class="stat-col" style="border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);">
+          <span class="stat-val" id="det-stat-loc" style="font-size:14px; font-family:var(--font-th); display:flex; align-items:center; height:100%;">Floor 3</span>
+          <span class="stat-lbl">Location</span>
+        </div>
+        <div class="stat-col">
+          <span class="stat-val" id="det-stat-usage">0</span>
+          <span class="stat-lbl">Bookings</span>
+        </div>
+      </div>
+
+      <div class="about-box liquid-glass">
+        <h4>ข้อมูลอุปกรณ์</h4>
+        <p id="det-desc">Description goes here...</p>
+        <ul id="det-rules" style="margin-top: 12px; padding-left: 16px; font-size: 13px; color: var(--danger); opacity: 0.9;"></ul>
+      </div>
+    </div>
+  </div>
+  <button class="btn-bottom-fixed" id="btn-open-booking" onclick="openBookingSheet()">Book Appointment</button>
+</div>
+
+<!-- ================= BOOKING BOTTOM SHEET (Radial Dial UI) ================= -->
+<div class="sheet-overlay" id="sheet-overlay" onclick="closeBookingSheet()"></div>
+<div class="bottom-sheet" id="booking-sheet">
+  <div class="sheet-header">
+    <button class="icon-btn" onclick="closeBookingSheet()" style="width: 36px; height: 36px; border:none; background:rgba(255,255,255,0.05);">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <h2>Book Appointment</h2>
+  </div>
+
+  <div class="bk-item-card">
+    <div class="bk-item-img" id="bk-img-bg"><img src="" id="bk-img"></div>
+    <div class="bk-item-info">
+      <h4 id="bk-title">Item Name</h4>
+      <p id="bk-cat">Category</p>
+    </div>
+  </div>
+
+  <div class="input-row">
+    <input type="text" id="bk-note" class="input-dark" placeholder="หมายเหตุ (วัตถุประสงค์)" style="margin:0;">
+  </div>
+  
+  <div class="end-time-row">
+    <label>ระบุเวลาสิ้นสุด (End Time)</label>
+    <input type="time" id="bk-time-end" class="end-time-input" value="10:00" required>
+  </div>
+
+  <!-- THE RADIAL DIAL UI -->
+  <div class="dial-wrapper">
+    <div class="time-wedge"></div>
+    
+    <!-- Date Track -->
+    <div class="scroll-track" id="date-track">
+      <!-- Injected via JS -->
+    </div>
+
+    <!-- Time Start Track -->
+    <div class="scroll-track" id="time-track">
+      <!-- Injected via JS -->
+    </div>
+
+    <button class="btn-circle-confirm" onclick="confirmBooking()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <p class="err-msg" id="bk-err"></p>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-(function(){
-  "use strict";
-
-  /* ---------- PillNav GSAP Logic ---------- */
-  const pills = document.querySelectorAll('.pill');
-  const tlRefs = [];
-  const activeTweenRefs = [];
-  const ease = "power3.easeOut";
-
-  function layoutPillNav() {
-    pills.forEach((pill, index) => {
-      const circle = pill.querySelector('.hover-circle');
-      const label = pill.querySelector('.pill-label');
-      const hoverLabel = pill.querySelector('.pill-label-hover');
-      if (!circle) return;
-
-      const rect = pill.getBoundingClientRect();
-      if(rect.width === 0) return;
-
-      const w = rect.width;
-      const h = rect.height;
-
-      const R = ((w * w) / 4 + h * h) / (2 * h);
-      const D = Math.ceil(2 * R) + 2;
-      const delta = Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 1;
-      const originY = D - delta;
-
-      circle.style.width = `${D}px`;
-      circle.style.height = `${D}px`;
-      circle.style.bottom = `-${delta}px`;
-
-      gsap.set(circle, { xPercent: -50, scale: 0, transformOrigin: `50% ${originY}px` });
-
-      if (label) gsap.set(label, { y: 0 });
-      if (hoverLabel) gsap.set(hoverLabel, { y: h + 12, opacity: 0 });
-
-      if (tlRefs[index]) tlRefs[index].kill();
-      const tl = gsap.timeline({ paused: true });
-
-      tl.to(circle, { scale: 1.2, xPercent: -50, duration: 0.4, ease, overwrite: 'auto' }, 0);
-      if (label) tl.to(label, { y: -(h + 8), duration: 0.4, ease, overwrite: 'auto' }, 0);
-      
-      if (hoverLabel) {
-        gsap.set(hoverLabel, { y: Math.ceil(h + 20), opacity: 0 });
-        tl.to(hoverLabel, { y: 0, opacity: 1, duration: 0.4, ease, overwrite: 'auto' }, 0);
-      }
-      tlRefs[index] = tl;
-    });
-  }
-
-  layoutPillNav();
-  window.addEventListener('resize', layoutPillNav);
-  if (document.fonts?.ready) { document.fonts.ready.then(layoutPillNav).catch(() => {}); }
-
-  pills.forEach((pill, i) => {
-    pill.addEventListener('mouseenter', () => {
-      if (pill.classList.contains('active')) return;
-      const tl = tlRefs[i];
-      if (!tl) return;
-      if (activeTweenRefs[i]) activeTweenRefs[i].kill();
-      activeTweenRefs[i] = tl.tweenTo(tl.duration(), { duration: 0.3, ease, overwrite: 'auto' });
-    });
-    
-    pill.addEventListener('mouseleave', () => {
-      if (pill.classList.contains('active')) return;
-      const tl = tlRefs[i];
-      if (!tl) return;
-      if (activeTweenRefs[i]) activeTweenRefs[i].kill();
-      activeTweenRefs[i] = tl.tweenTo(0, { duration: 0.2, ease, overwrite: 'auto' });
-    });
-  });
-
-  const logoMark = document.querySelector('.logo-mark');
-  if(logoMark) {
-    logoMark.addEventListener('mouseenter', () => {
-      gsap.fromTo(logoMark, {rotate: 0}, {rotate: 360, duration: 0.4, ease, overwrite: 'auto'});
-    });
-  }
-
-  /* ---------- Initialization for header date ---------- */
-  document.getElementById('cal-current-date').textContent = new Date().toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
-
-  /* ---------- Icons ---------- */
-  const icons = {
-    laptop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="10.5" rx="1.4"/><path d="M2.2 19.2h19.6M9.5 19.2v-1.2M14.5 19.2v-1.2"/></svg>',
-    camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.6-2.5h4.8L16 7"/><circle cx="12" cy="13.4" r="3.4"/></svg>',
-    projector:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="14" height="8" rx="2"/><circle cx="9.5" cy="12" r="2.3"/><path d="M16.5 10.5l5-2.2v7.4l-5-2.2M5.5 16v2.3M12.5 16v2.3"/></svg>',
-    audio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="5.3"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21"/></svg>',
-    tools:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a3.6 3.6 0 0 1 5 5L11 20l-4-4 8.5-8.5a3.6 3.6 0 0 1-1-1z"/><path d="M4 20l2.2-2.2"/></svg>',
-    vehicle:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 15.5l1.4-4.7A2.2 2.2 0 0 1 7 9.2h10a2.2 2.2 0 0 1 2.1 1.6l1.4 4.7"/><rect x="2.3" y="15.5" width="19.4" height="4" rx="1.3"/><circle cx="7" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg>'
-  };
-  const catLabel = {laptop:'โน้ตบุ๊ก', camera:'กล้อง', projector:'โปรเจคเตอร์/AV', audio:'เสียง', tools:'เครื่องมือช่าง', vehicle:'ยานพาหนะ'};
-
-  /* ---------- Equipment data (Expanded for App-style Modal) ---------- */
+  /* ================= 1. FULL DATASET (14 Items) ================= */
   const equipment = [
-    {id:'LP-01', name:'MacBook Pro 14" M3', category:'laptop', location:'ชั้น 3 โซนไอที', base:'available',
-     img:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80',
-     desc:'แล็ปท็อปประสิทธิภาพสูง ชิป M3 Pro Ram 18GB SSD 512GB เหมาะสำหรับงานประมวลผลหนัก กราฟิก และการตัดต่อวิดีโอ',
-     rules:['ห้ามนำอาหารและเครื่องดื่มมารับประทานใกล้เครื่อง', 'กรุณา Log out จาก Apple ID และลบไฟล์ส่วนตัวทั้งหมดก่อนคืน', 'ห้ามติดตั้งโปรแกรมเถื่อนเด็ดขาด']},
-    {id:'LP-02', name:'MacBook Air 13"', category:'laptop', location:'ชั้น 3 โซนไอที', base:'available',
-     img:'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&q=80',
-     desc:'แล็ปท็อปบางเบา ชิป M2 Ram 8GB พกพาสะดวก แบตเตอรี่ใช้งานได้ยาวนานตลอดวัน',
-     rules:['ใช้งานอย่างระมัดระวัง ห้ามทำตกหรือกระแทก', 'ห้ามติดสติ๊กเกอร์บนตัวเครื่อง', 'นำสายชาร์จมาคืนพร้อมตัวเครื่องเสมอ']},
-    {id:'LP-03', name:'ThinkPad X1 Carbon', category:'laptop', location:'ชั้น 3 โซนไอที', base:'maintenance',
-     img:'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&q=80',
-     desc:'โน้ตบุ๊กสาย Business น้ำหนักเบา คีย์บอร์ดพิมพ์สนุก พร้อมระบบความปลอดภัยระดับองค์กร (Windows 11 Pro)',
-     rules:['ห้ามถอดชิ้นส่วนหรือแกะฝาหลังเด็ดขาด', 'หากพบปัญหาจอฟ้า ให้แจ้งฝ่ายไอทีทันที']},
-    {id:'LP-04', name:'Surface Laptop 5', category:'laptop', location:'ชั้น 3 โซนไอที', base:'available',
-     img:'https://images.unsplash.com/photo-1629131726692-1accd0c53ce0?w=800&q=80',
-     desc:'สัมผัสหน้าจอทัชสกรีน 13.5 นิ้ว ดีไซน์หรูหรา รองรับการใช้งานผ่าน Surface Pen',
-     rules:['ระวังหน้าจอเป็นรอย ห้ามใช้วัตถุของแข็งขีดข่วนหน้าจอ', 'ห้ามทำน้ำหกใส่คีย์บอร์ด Alcantara']},
-    {id:'CM-01', name:'Canon EOS R6', category:'camera', location:'ห้องเก็บอุปกรณ์ ชั้น 1', base:'available',
-     img:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80',
-     desc:'กล้อง Mirrorless Full-frame ความละเอียด 20MP ออโต้โฟกัสติดตามตาแม่นยำเยี่ยม พร้อมเลนส์ 24-105mm',
-     rules:['ห้ามถอดเปลี่ยนเลนส์ในที่ที่มีฝุ่นหรือละอองน้ำ', 'คืนพร้อมแบตเตอรี่ที่ชาร์จเต็มแล้วและเคลียร์ SD Card', 'ใส่กระเป๋ากล้องให้เรียบร้อยเมื่อไม่ได้ใช้งาน']},
-    {id:'CM-02', name:'Sony ZV-E10 + ขาตั้ง', category:'camera', location:'ห้องเก็บอุปกรณ์ ชั้น 1', base:'available',
-     img:'https://images.unsplash.com/photo-1621255013063-e380f55bb8ce?w=800&q=80',
-     desc:'กล้อง VLOG เซนเซอร์ APS-C พร้อมไมค์ในตัวและขาตั้งกล้องแบบ Grip',
-     rules:['ระวังไมค์โครโฟนด้านบนโดนน้ำหรือกระแทก', 'หลังใช้งานเสร็จ กรุณาปิดสวิตช์เพื่อประหยัดแบตเตอรี่']},
-    {id:'PJ-01', name:'Epson EB-2250U', category:'projector', location:'ห้องประชุมใหญ่ ชั้น 5', base:'available',
-     img:'https://images.unsplash.com/photo-1535016120720-40c746a6580c?w=800&q=80',
-     desc:'โปรเจคเตอร์ความสว่าง 5,000 Lumens ความละเอียด WUXGA สู้แสงในห้องประชุมได้ดีเยี่ยม',
-     rules:['รอให้พัดลมระบายความร้อนหยุดหมุนก่อนถอดปลั๊กทุกครั้ง', 'ห้ามมองแสงจากหน้าเลนส์โดยตรง']},
-    {id:'PJ-02', name:'BenQ พกพา + จอ', category:'projector', location:'ห้องเก็บอุปกรณ์ ชั้น 1', base:'available',
-     img:'https://images.unsplash.com/photo-1628104443153-61fcfa6be220?w=800&q=80',
-     desc:'โปรเจคเตอร์แบบพกพาไร้สาย พร้อมแบตเตอรี่ในตัวและจอพับได้ขนาด 50 นิ้ว',
-     rules:['ม้วนจอเก็บอย่างระมัดระวัง ห้ามพับจนเกิดรอยยับ', 'ห้ามใช้ในพื้นที่ที่มีความชื้นสูง']},
-    {id:'AU-01', name:'ลำโพงบลูทูธ JBL PartyBox', category:'audio', location:'ห้องเก็บอุปกรณ์ ชั้น 1', base:'available',
-     img:'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&q=80',
-     desc:'ลำโพงบลูทูธขนาดใหญ่ กำลังขับสูง พร้อมไฟ RGB ซิงค์กับจังหวะเพลง แบตเตอรี่ 12 ชม.',
-     rules:['ห้ามเปิดระดับเสียงสูงสุดต่อเนื่องเกิน 2 ชั่วโมง', 'ห้ามนำไปตากฝนแม้จะมีกันน้ำก็ตาม']},
-    {id:'AU-02', name:'ไมค์ลอย 2 ตัว + มิกเซอร์', category:'audio', location:'ห้องประชุมใหญ่ ชั้น 5', base:'available',
-     img:'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&q=80',
-     desc:'ชุดไมโครโฟนไร้สายแบบคู่ คลื่น UHF พร้อมมิกเซอร์ขนาดเล็ก 4 ชาแนล',
-     rules:['ห้ามเคาะหรือเป่าหัวไมโครโฟน', 'ถอดถ่าน AA ออกจากไมค์ทุกครั้งหลังใช้งานเสร็จ']},
-    {id:'TL-01', name:'ไขควงไฟฟ้า Bosch', category:'tools', location:'ห้องช่าง ชั้น B1', base:'available',
-     img:'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80',
-     desc:'สว่านไขควงไร้สาย 12V ใช้งานประกอบเฟอร์นิเจอร์ หรือเจาะผนังเบา มีกล่องพร้อมดอกสว่านครบชุด',
-     rules:['สวมแว่นตานิรภัยและถุงมือทุกครั้งที่ใช้งาน', 'เก็บดอกสว่านเข้ากล่องให้ครบถ้วนก่อนนำมาคืน']},
-    {id:'TL-02', name:'ชุดเครื่องมือช่างพื้นฐาน', category:'tools', location:'ห้องช่าง ชั้น B1', base:'available',
-     img:'https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&q=80',
-     desc:'กล่องเครื่องมืออเนกประสงค์ ประกอบด้วย คีม, ประแจ, ตลับเมตร, ค้อน และไขควงหลากหลายขนาด',
-     rules:['ทำความสะอาดเครื่องมือให้ปราศจากคราบน้ำมันก่อนคืน', 'ห้ามนำไปใช้ผิดประเภท เช่น เอาประแจไปตอกแทนค้อน']},
-    {id:'VH-01', name:'รถกระบะบริษัท กข-1234', category:'vehicle', location:'ลานจอด ชั้น B1', base:'available',
-     img:'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80',
-     desc:'รถกระบะตอนเดียว หลังคาตู้ทึบ สำหรับขนส่งสินค้าและอุปกรณ์ขนาดใหญ่',
-     rules:['ผู้เบิกต้องมีใบขับขี่รถยนต์ที่ยังไม่หมดอายุเท่านั้น', 'ห้ามดื่มสุราหรือเสพของมึนเมาเด็ดขาด', 'นำรถไปเติมน้ำมันให้เต็มถังและนำใบเสร็จมาเบิกก่อนคืนกุญแจ']},
-    {id:'VH-02', name:'รถตู้บริษัท งท-5678', category:'vehicle', location:'ลานจอด ชั้น B1', base:'maintenance',
-     img:'https://images.unsplash.com/photo-1582269222415-ff55dc0fa36d?w=800&q=80',
-     desc:'รถตู้ 11 ที่นั่ง สำหรับพนักงานเดินทางไปปฏิบัติงานนอกสถานที่',
-     rules:['ห้ามสูบบุหรี่ภายในรถเด็ดขาด (ปรับ 2,000 บาท)', 'เคลียร์ขยะและสัมภาระของตนเองออกให้หมดหลังจบการเดินทาง']}
+    {id:'LP-01', name:'MacBook Pro 14" M3', category:'Laptop', location:'ชั้น 3 โซนไอที', base:'available',
+     img:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80', desc:'แล็ปท็อปประสิทธิภาพสูง เหมาะสำหรับงานกราฟิก', rules:['ห้ามดื่มน้ำใกล้เครื่อง', 'Log out บัญชีก่อนคืน']},
+    {id:'LP-02', name:'MacBook Air 13"', category:'Laptop', location:'ชั้น 3 โซนไอที', base:'available',
+     img:'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&q=80', desc:'พกพาสะดวก แบตเตอรี่ทนทาน', rules:['ระวังการกระแทก', 'คืนสายชาร์จด้วยเสมอ']},
+    {id:'LP-03', name:'ThinkPad X1 Carbon', category:'Laptop', location:'ชั้น 3 โซนไอที', base:'maintenance',
+     img:'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&q=80', desc:'โน้ตบุ๊กสาย Business น้ำหนักเบา', rules:['แจ้งไอทีทันทีเมื่อมีปัญหา']},
+    {id:'LP-04', name:'Surface Laptop 5', category:'Laptop', location:'ชั้น 3 โซนไอที', base:'available',
+     img:'https://images.unsplash.com/photo-1629131726692-1accd0c53ce0?w=800&q=80', desc:'หน้าจอทัชสกรีน รองรับ Surface Pen', rules:['ระวังหน้าจอเป็นรอย']},
+    {id:'CM-01', name:'Canon EOS R6', category:'Camera', location:'ห้องเก็บของ', base:'available',
+     img:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80', desc:'กล้อง Full-frame 20MP', rules:['ชาร์จแบตเต็มก่อนคืน', 'เคลียร์ SD Card']},
+    {id:'CM-02', name:'Sony ZV-E10', category:'Camera', location:'ห้องเก็บของ', base:'available',
+     img:'https://images.unsplash.com/photo-1621255013063-e380f55bb8ce?w=800&q=80', desc:'กล้อง VLOG พร้อมไมค์', rules:['ระวังไมค์โดนน้ำ']},
+    {id:'PJ-01', name:'Epson EB-2250U', category:'Projector', location:'ห้องประชุม 5', base:'available',
+     img:'https://images.unsplash.com/photo-1535016120720-40c746a6580c?w=800&q=80', desc:'โปรเจคเตอร์ 5,000 Lumens', rules:['รอพัดลมดับก่อนถอดปลั๊ก']},
+    {id:'PJ-02', name:'BenQ พกพา', category:'Projector', location:'ห้องเก็บของ', base:'available',
+     img:'https://images.unsplash.com/photo-1628104443153-61fcfa6be220?w=800&q=80', desc:'โปรเจคเตอร์ไร้สาย พร้อมจอ 50 นิ้ว', rules:['ม้วนจอเก็บระวังรอยยับ']},
+    {id:'AU-01', name:'JBL PartyBox', category:'Audio', location:'ห้องเก็บของ', base:'available',
+     img:'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&q=80', desc:'ลำโพงบลูทูธ กำลังขับสูง', rules:['ห้ามนำไปตากฝน']},
+    {id:'AU-02', name:'ไมค์ลอยคู่', category:'Audio', location:'ห้องประชุม 5', base:'available',
+     img:'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&q=80', desc:'ไมค์ไร้สาย UHF 2 ตัว', rules:['ถอดถ่านหลังใช้งาน']},
+    {id:'TL-01', name:'ไขควงไฟฟ้า Bosch', category:'Tools', location:'ห้องช่าง', base:'available',
+     img:'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80', desc:'สว่านไร้สาย 12V', rules:['สวมอุปกรณ์นิรภัยเสมอ']},
+    {id:'TL-02', name:'ชุดเครื่องมือช่าง', category:'Tools', location:'ห้องช่าง', base:'available',
+     img:'https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&q=80', desc:'คีม ประแจ ค้อน', rules:['ทำความสะอาดก่อนเก็บ']},
+    {id:'VH-01', name:'รถกระบะ กข-1234', category:'Vehicle', location:'ลานจอด B1', base:'available',
+     img:'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80', desc:'สำหรับขนส่งสินค้า', rules:['มีใบขับขี่', 'เติมน้ำมันเต็มถัง']},
+    {id:'VH-02', name:'รถตู้ งท-5678', category:'Vehicle', location:'ลานจอด B1', base:'maintenance',
+     img:'https://images.unsplash.com/photo-1582269222415-ff55dc0fa36d?w=800&q=80', desc:'รถตู้ 11 ที่นั่ง', rules:['ห้ามสูบบุหรี่', 'นำขยะไปทิ้ง']}
   ];
 
-  /* ---------- State ---------- */
-  let bookings = safeParse(localStorage.getItem('yd_bookings')) || [];
-  let theme = localStorage.getItem('yd_theme') || 'light';
-  let activeView = 'home';
-  let filterStatus = 'all';
-  let filterCat = 'all';
+  /* ================= 2. STATE & TIME UTILS ================= */
+  const categories = ['All', 'Laptop', 'Camera', 'Projector', 'Audio', 'Tools', 'Vehicle'];
+  let activeCategory = 'All';
   let searchQuery = '';
+  let bookings = JSON.parse(localStorage.getItem('yd_bookings_v7')) || [];
+  let currentItem = null;
+  let selectedDate = '';
+  let selectedStartTime = '09:00';
+  let activeTab = 'home';
   let isAdmin = sessionStorage.getItem('yd_admin') === 'true';
 
-  function safeParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
-  function saveBookings(){ localStorage.setItem('yd_bookings', JSON.stringify(bookings)); }
-  function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
-  function uid(){ return 'bk_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  // Utils for Save/Parse
+  function saveBookings() { localStorage.setItem('yd_bookings_v7', JSON.stringify(bookings)); }
+  function safeParse(data) { try { return JSON.parse(data); } catch(e){ return []; } }
 
-  /* ---------- Admin Session Logic ---------- */
-  function updateAdminUI() {
-    if (isAdmin) {
-      document.body.classList.add('is-admin');
-      setTimeout(layoutPillNav, 100);
-    } else {
-      document.body.classList.remove('is-admin');
-      if (activeView === 'admin') switchView('home');
+  function getTodayISO() {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0,10);
+  }
+  function generateId() { return 'bk_' + Math.random().toString(36).substr(2, 9); }
+  function fmtDate(iso) { 
+    const d = new Date(iso); 
+    const months = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()+543}`;
+  }
+
+  // คำนวณระยะเวลา (Duration)
+  function getDurationText(start, end) {
+    const s = start.split(':'); const e = end.split(':');
+    const mins = (e[0]*60 + parseInt(e[1])) - (s[0]*60 + parseInt(s[1]));
+    const h = Math.floor(mins/60); const m = mins % 60;
+    let txt = '';
+    if(h>0) txt += h + ' ชั่วโมง ';
+    if(m>0) txt += m + ' นาที';
+    return txt.trim();
+  }
+
+  // คำนวณนับถอยหลัง (Live Countdown)
+  function getCountdownText(date, start, end) {
+    const now = new Date();
+    const tStart = new Date(`${date}T${start}:00`);
+    const tEnd = new Date(`${date}T${end}:00`);
+
+    if (now > tEnd) return '<span style="color:var(--text-muted)">หมดเวลาจองแล้ว</span>';
+    if (now >= tStart && now <= tEnd) {
+      const diffMins = Math.floor((tEnd - now) / 60000);
+      const h = Math.floor(diffMins / 60); const m = diffMins % 60;
+      return `<span style="color:var(--primary-cyan)">กำลังใช้งาน (เหลือ ${h>0 ? h+' ชม. ':''}${m} นาที)</span>`;
+    }
+    if (now < tStart) {
+      const diffMins = Math.floor((tStart - now) / 60000);
+      const d = Math.floor(diffMins / (60*24));
+      const h = Math.floor((diffMins % (60*24)) / 60);
+      const m = diffMins % 60;
+      let txt = 'เริ่มต้นในอีก ';
+      if(d>0) txt += d + ' วัน ';
+      if(h>0) txt += h + ' ชม. ';
+      if(m>0 || (d===0 && h===0)) txt += m + ' นาที';
+      return `<span style="color:var(--primary-purple-light)">${txt}</span>`;
     }
   }
-  updateAdminUI(); 
 
-  document.getElementById('admin-login-trigger').addEventListener('click', (e) => {
-    e.preventDefault();
-    if (isAdmin) { switchView('admin'); return; }
-    const pass = prompt('กรุณากรอกรหัสผ่านสำหรับแอดมิน (admin123):');
-    if (pass === 'admin123') {
-      isAdmin = true; sessionStorage.setItem('yd_admin', 'true');
-      updateAdminUI(); showToast('เข้าสู่ระบบแอดมินเรียบร้อย'); switchView('admin');
-    } else if (pass !== null) { showToast('รหัสผ่านไม่ถูกต้อง'); }
-  });
-
-  document.getElementById('btn-logout-admin').addEventListener('click', () => {
-    isAdmin = false; sessionStorage.removeItem('yd_admin');
-    updateAdminUI(); showToast('ออกจากระบบแอดมิน');
-  });
-
-  /* ---------- Status logic ---------- */
-  function computeStatus(item){
-    if(item.base === 'maintenance') return 'maintenance';
-    const today = todayISO();
-    const busy = bookings.some(b => b.equipmentId === item.id && b.date === today);
-    return busy ? 'busy' : 'available';
+  function getStatus(item) {
+    if(item.base === 'maintenance') return 'Maintenance';
+    const today = getTodayISO();
+    const isBusy = bookings.some(b => b.eqId === item.id && b.date === today);
+    return isBusy ? 'Booked' : 'Available';
   }
-  const statusLabel = {available:'ว่าง', busy:'ถูกจองวันนี้', maintenance:'ซ่อมบำรุง'};
 
-  /* ---------- Theme ---------- */
-  function applyTheme(t){
-    theme = t; document.documentElement.setAttribute('data-theme', t); localStorage.setItem('yd_theme', t);
-    document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.themeBtn === t));
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerHTML = msg; t.classList.add('show');
+    setTimeout(()=> t.classList.remove('show'), 3500);
   }
-  document.querySelectorAll('.theme-btn').forEach(b=>{ b.addEventListener('click', ()=> applyTheme(b.dataset.themeBtn)); });
-  applyTheme(theme);
 
-  /* ---------- Views ---------- */
-  function switchView(view){
-    activeView = view;
-    document.querySelectorAll('.view').forEach(s=> s.classList.toggle('active', s.id === 'view-'+view));
-    document.querySelectorAll('.pill').forEach((b, idx)=>{
-      const on = b.dataset.view === view;
-      b.classList.toggle('active', on); b.setAttribute('aria-selected', on);
-      if (on && tlRefs.length > 0) {
-         if(activeTweenRefs[idx]) activeTweenRefs[idx].kill();
-         if(tlRefs[idx]) tlRefs[idx].progress(0);
-      }
+  /* ================= 3. INIT & CORE RENDER ================= */
+  function init() {
+    renderChips();
+    const savedName = localStorage.getItem('yd_user_name') || '';
+    const savedDept = localStorage.getItem('yd_user_dept') || '';
+    document.getElementById('user-name').value = savedName;
+    document.getElementById('user-dept').value = savedDept;
+    
+    if(savedName) {
+      document.getElementById('display-username').textContent = savedName.split(' ')[0];
+      document.getElementById('avatar-initial').textContent = savedName.charAt(0).toUpperCase();
+    }
+
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase().trim();
+      renderCards();
     });
+
+    document.getElementById('user-name').addEventListener('input', (e) => {
+      localStorage.setItem('yd_user_name', e.target.value);
+      if(e.target.value) {
+        document.getElementById('display-username').textContent = e.target.value.split(' ')[0];
+        document.getElementById('avatar-initial').textContent = e.target.value.charAt(0).toUpperCase();
+      }
+      if(activeTab === 'bookings') renderMyBookings();
+    });
+    document.getElementById('user-dept').addEventListener('input', (e) => {
+      localStorage.setItem('yd_user_dept', e.target.value);
+    });
+
+    updateAdminUI();
+    renderAll();
+    
+    // Update live countdowns every 1 minute
+    setInterval(() => {
+      if(activeTab === 'bookings') renderMyBookings();
+      if(activeTab === 'calendar') renderVisualCalendar();
+    }, 60000);
+  }
+
+  function renderAll() {
+    renderCards();
+    if(activeTab === 'bookings') renderMyBookings();
+    if(activeTab === 'calendar') renderVisualCalendar();
+    if(activeTab === 'admin') renderAdmin();
+  }
+
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.nav-item[data-tab="${tab}"]`).classList.add('active');
+    document.querySelectorAll('.view').forEach(s => s.classList.remove('active'));
+    document.getElementById(`view-${tab}`).classList.add('active');
     window.scrollTo({top:0, behavior:'smooth'});
     renderAll();
   }
-  
-  document.querySelectorAll('.pill').forEach(b=> b.addEventListener('click', ()=> switchView(b.dataset.view)));
-  document.querySelectorAll('[data-goto]').forEach(b=> b.addEventListener('click', ()=> switchView(b.dataset.goto)));
 
-  /* ---------- Category filter chips ---------- */
-  const catFilterEl = document.getElementById('cat-filter');
-  const cats = ['all', ...Object.keys(catLabel)];
-  catFilterEl.innerHTML = cats.map(c => `<button class="chip${c==='all'?' active':''}" data-cat="${c}">${c==='all'?'ทุกหมวดหมู่':catLabel[c]}</button>`).join('');
-  catFilterEl.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.chip');
-    if(!btn) return;
-    filterCat = btn.dataset.cat;
-    catFilterEl.querySelectorAll('.chip').forEach(c=> c.classList.toggle('active', c===btn));
-    renderEquipment();
-  });
-
-  const statusFilterEl = document.getElementById('status-filter');
-  statusFilterEl.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.chip');
-    if(!btn) return;
-    filterStatus = btn.dataset.status;
-    statusFilterEl.querySelectorAll('.chip').forEach(c=> c.classList.toggle('active', c===btn));
-    renderEquipment();
-  });
-
-  document.getElementById('search-input').addEventListener('input', (e)=>{
-    searchQuery = e.target.value.trim().toLowerCase();
-    renderEquipment();
-  });
-
-  /* ---------- Tag card render ---------- */
-  function tagCard(item){
-    const status = computeStatus(item);
-    return `
-      <div class="tag-card">
-        <div class="tag-stub">
-          <span class="icon">${icons[item.category]}</span>
-          <span class="aid">${item.id}</span>
-        </div>
-        <div class="tag-body">
-          <div class="tag-top">
-            <h3>${item.name}</h3>
-            <span class="status-chip ${status}">${statusLabel[status]}</span>
-          </div>
-          <p class="tag-meta">${item.location}</p>
-          <div class="tag-foot">
-            <span class="tag-cat">${catLabel[item.category]}</span>
-            <button class="btn btn-primary btn-sm" data-book-detail="${item.id}">รายละเอียด</button>
-          </div>
-        </div>
-      </div>`;
+  /* ================= HOME RENDER ================= */
+  function renderChips() {
+    document.getElementById('cat-filters').innerHTML = categories.map(c => 
+      `<button class="filter-chip ${c === activeCategory ? 'active' : ''}" onclick="setCategory('${c}')">${c}</button>`
+    ).join('');
   }
+  function setCategory(cat) { activeCategory = cat; renderChips(); renderCards(); }
 
-  function renderEquipment(){
-    const grid = document.getElementById('equipment-grid');
-    let list = equipment.filter(it=>{
-      if(filterCat !== 'all' && it.category !== filterCat) return false;
-      const status = computeStatus(it);
-      if(filterStatus !== 'all' && status !== filterStatus) return false;
-      if(searchQuery && !it.name.toLowerCase().includes(searchQuery)) return false;
+  function renderCards() {
+    const cont = document.getElementById('equipment-list');
+    let list = equipment.filter(e => {
+      if(activeCategory !== 'All' && e.category !== activeCategory) return false;
+      if(searchQuery && !e.name.toLowerCase().includes(searchQuery)) return false;
       return true;
     });
-    if(list.length === 0){
-      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><h3>ไม่พบอุปกรณ์</h3><p>ลองเปลี่ยนคำค้นหาหรือตัวกรอง</p></div>`;
+    
+    if(!list.length) {
+      cont.innerHTML = `<div class="liquid-glass" style="text-align:center; padding:40px; color:var(--text-muted);">ไม่พบอุปกรณ์ที่ค้นหา</div>`;
       return;
     }
-    grid.innerHTML = list.map(tagCard).join('');
-  }
 
-  function renderHome(){
-    const today = todayISO();
-    const avail = equipment.filter(it=> computeStatus(it) === 'available').length;
-    const busy = equipment.filter(it=> computeStatus(it) === 'busy').length;
-    const maint = equipment.filter(it=> computeStatus(it) === 'maintenance').length;
-    const userName = document.getElementById('user-name').value.trim() || localStorage.getItem('yd_user_name') || '';
-    const mine = userName ? bookings.filter(b=> b.name.trim().toLowerCase() === userName.toLowerCase() && b.date >= today).length : 0;
-
-    document.getElementById('stats-row').innerHTML = `
-      <div class="stat-card"><div class="num">${equipment.length}</div><div class="label">อุปกรณ์ทั้งหมด</div></div>
-      <div class="stat-card"><div class="num">${avail}</div><div class="label">ว่างตอนนี้</div></div>
-      <div class="stat-card"><div class="num">${busy}</div><div class="label">ถูกจองวันนี้</div></div>
-      <div class="stat-card"><div class="num">${maint}</div><div class="label">ซ่อมบำรุง</div></div>
-      <div class="stat-card"><div class="num">${mine}</div><div class="label">การจองของฉัน (ที่จะถึง)</div></div>
-    `;
-
-    const featured = equipment.filter(it=> computeStatus(it) === 'available').slice(0,3);
-    document.getElementById('home-preview').innerHTML = featured.map(tagCard).join('');
-  }
-
-  function fmtDate(iso){
-    const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString('th-TH', {day:'numeric', month:'short', year:'numeric'});
-  }
-
-  function renderBookings(){
-    const nameInput = document.getElementById('user-name');
-    const deptInput = document.getElementById('user-dept');
-    const list = document.getElementById('bookings-list');
-    const name = nameInput.value.trim();
-
-    if(!name){
-      list.innerHTML = `<div class="empty-state"><h3>กรอกชื่อของคุณด้านบน</h3><p>เพื่อดูรายการจองที่ตรงกับชื่อคุณ</p></div>`;
-      return;
-    }
-    const mine = bookings
-      .filter(b=> b.name.trim().toLowerCase() === name.toLowerCase())
-      .sort((a,b)=> (a.date+a.start).localeCompare(b.date+b.start));
-
-    if(mine.length === 0){
-      list.innerHTML = `<div class="empty-state"><h3>ยังไม่มีการจอง</h3><p>ไปที่แท็บ "อุปกรณ์" เพื่อเริ่มจอง</p></div>`;
-      return;
-    }
-    list.innerHTML = mine.map(b=>`
-      <div class="booking-row" data-booking-id="${b.id}">
-        <div class="b-main">
-          <h4>${b.equipmentName} <span class="tag-cat">(${b.equipmentId})</span></h4>
-          <p class="b-meta">${fmtDate(b.date)} · ${b.start}–${b.end} น.${b.dept ? ' · แผนก '+b.dept : ''}${b.note ? '<br>หมายเหตุ: '+escapeHTML(b.note) : ''}</p>
+    cont.innerHTML = list.map((item, idx) => {
+      const status = getStatus(item);
+      const badgeBg = status === 'Available' ? 'var(--text-main)' : (status === 'Booked' ? '#fbbf24' : '#ef4444');
+      const badgeColor = status === 'Available' ? 'var(--bg-dark-1)' : '#000';
+      return `
+      <div class="eq-card" onclick="openDetails('${item.id}', ${idx})">
+        <div class="card-badge" style="background:${badgeBg}; color:${badgeColor}">${status}</div>
+        <h3>${item.name}</h3>
+        <p>Location: ${item.location}</p>
+        <div class="card-img-container"><img src="${item.img}" alt=""></div>
+        <div class="card-actions">
+          <div class="card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
         </div>
-        <div class="b-actions">
-          <button class="btn-danger" data-cancel="${b.id}">ยกเลิก</button>
-        </div>
-      </div>
-    `).join('');
+      </div>`
+    }).join('');
   }
 
-  /* ---------- Render Admin Data ---------- */
-  function renderAdmin() {
-    if (!isAdmin) return;
-    document.getElementById('admin-stats-row').innerHTML = `
-      <div class="stat-card"><div class="num">${bookings.length}</div><div class="label">การจองในระบบทั้งหมด</div></div>
-      <div class="stat-card"><div class="num">${equipment.length}</div><div class="label">อุปกรณ์ทั้งหมด</div></div>
-    `;
+  /* ================= DETAILS ================= */
+  function openDetails(id, idx) {
+    currentItem = equipment.find(e => e.id === id);
+    if(!currentItem) return;
 
-    const tbody = document.getElementById('admin-bookings-table');
-    if (bookings.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--ink-soft); padding:30px;">ยังไม่มีการจองใดๆ ในระบบ</td></tr>`;
-      return;
-    }
-    const sorted = [...bookings].sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
-    tbody.innerHTML = sorted.map(b => `
-      <tr>
-        <td style="font-family:var(--font-display); font-size:12px; color:var(--ink-soft);">${b.id}</td>
-        <td><strong style="color:var(--ink);">${b.name}</strong><br><span style="font-size:12.5px; color:var(--ink-soft);">${b.dept || '-'}</span></td>
-        <td><strong style="color:var(--ink);">${b.equipmentName}</strong><br><span style="font-size:12.5px; color:var(--ink-soft);">${b.equipmentId}</span></td>
-        <td>${fmtDate(b.date)}<br><span style="font-size:12.5px; color:var(--ink-soft);">${b.start} - ${b.end} น.</span></td>
-        <td><button class="btn-danger" data-admin-del="${b.id}" style="padding:6px 12px; font-size:12px; border-radius:8px;">ยกเลิก/ลบ</button></td>
-      </tr>
-    `).join('');
-  }
+    const colors = ['var(--primary-purple)', 'var(--primary-cyan)', '#ffd6a5'];
+    const textColors = ['var(--text-main)', 'var(--text-dark)', 'var(--text-dark)'];
+    const bgCol = colors[idx % 3];
+    const txtCol = textColors[idx % 3];
 
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-admin-del]');
-    if (!btn) return;
-    if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลการจองนี้ออกจากระบบ?')) {
-      const id = btn.dataset.adminDel; bookings = bookings.filter(b => b.id !== id);
-      saveBookings(); showToast('ลบข้อมูลการจองสำเร็จ'); renderAll();
-    }
-  });
+    document.getElementById('det-bg').style.background = bgCol;
+    document.getElementById('bk-img-bg').style.background = bgCol;
+    document.getElementById('det-img').src = currentItem.img;
+    
+    const tag = document.getElementById('det-cat');
+    tag.textContent = currentItem.category;
+    tag.style.color = bgCol;
+    document.getElementById('det-title').textContent = currentItem.name;
+    
+    const status = getStatus(currentItem);
+    document.getElementById('det-stat-status').textContent = status;
+    document.getElementById('det-stat-status').style.color = status === 'Available' ? 'var(--primary-cyan)' : (status==='Booked' ? '#fbbf24' : '#ef4444');
+    document.getElementById('det-stat-loc').textContent = currentItem.location;
+    document.getElementById('det-stat-usage').textContent = bookings.filter(b => b.eqId === currentItem.id).length;
+    
+    document.getElementById('det-desc').textContent = currentItem.desc;
+    document.getElementById('det-rules').innerHTML = currentItem.rules.map(r => `<li>${r}</li>`).join('');
 
-  function escapeHTML(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-
-  document.getElementById('bookings-list').addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-cancel]');
-    if(!btn) return;
-    if(btn.dataset.confirm === '1'){
-      const id = btn.dataset.cancel; bookings = bookings.filter(b=> b.id !== id);
-      saveBookings(); showToast('ยกเลิกการจองแล้ว'); renderAll();
+    const btn = document.getElementById('btn-open-booking');
+    if(status === 'Maintenance') {
+      btn.textContent = 'ไม่พร้อมให้บริการ (ซ่อมบำรุง)'; btn.style.background = 'rgba(255,255,255,0.1)'; btn.style.color = 'var(--text-muted)'; btn.style.pointerEvents = 'none';
     } else {
-      btn.dataset.confirm = '1'; btn.textContent = 'ยืนยันยกเลิก?';
-      setTimeout(()=>{ btn.dataset.confirm=''; btn.textContent='ยกเลิก'; }, 3000);
+      btn.textContent = 'Book Appointment'; btn.style.background = bgCol; btn.style.color = txtCol; btn.style.pointerEvents = 'auto';
     }
-  });
+    document.getElementById('details-modal').classList.add('open');
+  }
+  function closeDetails() { document.getElementById('details-modal').classList.remove('open'); }
 
-  document.getElementById('user-name').addEventListener('input', (e)=>{
-    localStorage.setItem('yd_user_name', e.target.value); renderHome(); renderBookings();
-  });
-  document.getElementById('user-dept').addEventListener('input', (e)=>{
-    localStorage.setItem('yd_user_dept', e.target.value);
-  });
-  document.getElementById('user-name').value = localStorage.getItem('yd_user_name') || '';
-  document.getElementById('user-dept').value = localStorage.getItem('yd_user_dept') || '';
-
-
-  /* ========================================================================= */
-  /*                     New App-Style Details Modal Logic                     */
-  /* ========================================================================= */
-  const detailsOverlay = document.getElementById('details-overlay');
-  let currentDetailItem = null;
-
-  function openDetailsModal(itemId) {
-    currentDetailItem = equipment.find(it => it.id === itemId);
-    if(!currentDetailItem) return;
-    
-    const status = computeStatus(currentDetailItem);
-    const disabled = status === 'maintenance'; // If maintenance, totally disabled. If busy, can book future date.
-    
-    // UI Elements
-    document.getElementById('det-img').src = currentDetailItem.img;
-    document.getElementById('det-title').textContent = currentDetailItem.name;
-    document.getElementById('det-cat').textContent = catLabel[currentDetailItem.category];
-    document.getElementById('det-icon').innerHTML = icons[currentDetailItem.category];
-    document.getElementById('det-loc').textContent = currentDetailItem.location;
-    document.getElementById('det-desc').textContent = currentDetailItem.desc;
-    
-    // Status Chip
-    const statusChip = document.getElementById('det-status-chip');
-    statusChip.className = `status-chip ${status}`;
-    statusChip.textContent = statusLabel[status];
-    
-    // Rules
-    const rulesList = document.getElementById('det-rules');
-    rulesList.innerHTML = currentDetailItem.rules.map(r => `<li>${r}</li>`).join('');
-    
-    // Form pre-fill
-    document.getElementById('det-name').value = localStorage.getItem('yd_user_name') || '';
-    document.getElementById('det-dept').value = localStorage.getItem('yd_user_dept') || '';
-    document.getElementById('det-date').value = todayISO();
-    document.getElementById('det-date').min = todayISO(); // Prevent past dates
-    document.getElementById('det-start').value = '';
-    document.getElementById('det-end').value = '';
-    document.getElementById('det-note').value = '';
-    document.getElementById('det-err').textContent = '';
-    
-    document.getElementById('advance-badge').style.display = 'none';
-    
-    const submitBtn = document.getElementById('det-submit-btn');
-    if (disabled) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'ไม่พร้อมให้บริการ';
-    } else {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'ยืนยันการจอง';
+  /* ================= RADIAL DIAL LOGIC ================= */
+  function buildRadialDial() {
+    // 1. Build Dates
+    const dCont = document.getElementById('date-track');
+    const daysTh = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+    let dHtml = '';
+    for(let i=0; i<14; i++) {
+      let d = new Date(); d.setDate(d.getDate() + i);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      let iso = d.toISOString().slice(0,10);
+      if(i===0) selectedDate = iso;
+      dHtml += `<div class="date-item" data-val="${iso}">
+                  <svg class="dt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  <div class="dt-top">${daysTh[d.getDay()]}</div><div class="dt-bot">${d.getDate()}</div>
+                </div>`;
     }
+    dCont.innerHTML = dHtml;
 
-    detailsOverlay.classList.add('open');
+    // 2. Build Times
+    const tCont = document.getElementById('time-track');
+    let tHtml = '';
+    for(let i=8; i<=18; i++) {
+      let h = i < 10 ? `0${i}` : `${i}`;
+      let t = `${h}:00`;
+      let ampm = i < 12 ? 'AM' : 'PM';
+      let h12 = i > 12 ? i - 12 : i;
+      let displayTime = `${h12 < 10 ? '0'+h12 : h12}:00`;
+
+      tHtml += `<div class="time-item" data-val="${t}">
+                  <div class="tm-val">${displayTime}</div>
+                  <div class="tm-ampm">${ampm}</div>
+                </div>`;
+    }
+    tCont.innerHTML = tHtml;
+
+    // Attach Scroll Events for Curve Calculation
+    dCont.addEventListener('scroll', () => updateCurve(dCont, 350, 'date-item'));
+    tCont.addEventListener('scroll', () => updateCurve(tCont, 220, 'time-item'));
+    
+    // Allow clicking to scroll to center
+    dCont.querySelectorAll('.date-item').forEach(el => el.addEventListener('click', () => centerItem(el)));
+    tCont.querySelectorAll('.time-item').forEach(el => el.addEventListener('click', () => centerItem(el)));
+
+    // Init position
+    setTimeout(() => {
+      centerItem(dCont.children[0]);
+      centerItem(tCont.children[1]); // 09:00
+      document.getElementById('bk-time-end').value = '10:00';
+    }, 50);
   }
 
-  function closeDetailsModal() {
-    detailsOverlay.classList.remove('open');
-    currentDetailItem = null;
+  function centerItem(el) {
+    el.scrollIntoView({behavior: "smooth", block: "nearest", inline: "center"});
   }
 
-  // Handle Event for opening details
-  document.addEventListener('click', (e)=>{
-    const detailBtn = e.target.closest('[data-book-detail]');
-    if(detailBtn) openDetailsModal(detailBtn.dataset.bookDetail);
-  });
+  // ใช้คณิตศาสตร์คำนวณโค้งครึ่งวงกลม และ Apply ผ่าน JS ทันที (ไร้ความหน่วง)
+  function updateCurve(container, radius, itemClass) {
+    const containerCenter = container.scrollLeft + container.offsetWidth / 2;
+    const items = container.querySelectorAll('.' + itemClass);
+    let minDx = Infinity;
+    let closestItem = null;
 
-  // Handle Close events
-  document.getElementById('md-close-btn').addEventListener('click', closeDetailsModal);
-  detailsOverlay.addEventListener('click', (e)=>{ if(e.target === detailsOverlay) closeDetailsModal(); });
-  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && detailsOverlay.classList.contains('open')) closeDetailsModal(); });
+    // หา Item ที่อยู่ใกล้ตรงกลางที่สุดก่อน
+    items.forEach(item => {
+      const itemCenter = item.offsetLeft + (item.offsetWidth / 2);
+      const dx = itemCenter - containerCenter;
+      
+      if (Math.abs(dx) < minDx) {
+        minDx = Math.abs(dx);
+        closestItem = item;
+      }
+    });
 
-  // Handle Real-time Advance Booking Detection
-  document.getElementById('det-date').addEventListener('change', (e) => {
-    const selected = e.target.value;
-    const badge = document.getElementById('advance-badge');
-    if (selected > todayISO()) {
-      badge.style.display = 'block';
-      badge.innerHTML = `📅 เป็นการจองล่วงหน้าสำหรับวันที่ ${fmtDate(selected)}`;
-    } else {
-      badge.style.display = 'none';
+    // วนลูปปรับระยะโค้งทีละกล่อง
+    items.forEach(item => {
+      const itemCenter = item.offsetLeft + (item.offsetWidth / 2);
+      const dx = itemCenter - containerCenter;
+      
+      // ลิมิต dx ไม่ให้เกินรัศมี เพื่อป้องกันสมการ Math.sqrt ขัดข้อง
+      const cappedDx = Math.max(-radius, Math.min(radius, dx));
+      
+      // คำนวณแกน Y เพื่อสร้างความโค้ง (y = R - sqrt(R^2 - x^2))
+      const yOffset = radius - Math.sqrt(radius * radius - cappedDx * cappedDx);
+      
+      // คำนวณองศาหมุนให้หันเข้าหาจุดศูนย์กลาง
+      const angle = (cappedDx / radius) * 45; 
+      
+      const isActive = (item === closestItem);
+      if (isActive) {
+        item.classList.add('active');
+        if(itemClass === 'date-item') selectedDate = item.dataset.val;
+        if(itemClass === 'time-item') selectedStartTime = item.dataset.val;
+      } else {
+        item.classList.remove('active');
+      }
+
+      // ปรับขนาด Scale ของ Item ตรงกลาง
+      const scale = isActive ? (itemClass === 'date-item' ? 1.08 : 1.15) : 0.9;
+      // ลดแกน Y ลงเล็กน้อยสำหรับตัวที่ Active เพื่อให้มันเด้งออกมาชัดขึ้น
+      const activePop = isActive ? (itemClass === 'date-item' ? -5 : -3) : 0;
+      
+      // บังคับ Transform ตรงๆ ผ่าน JS เฟรมต่อเฟรม (ไม่ต้องผ่าน CSS Transition) = สมูท 100%
+      item.style.transform = `translateY(${yOffset + activePop}px) rotate(${angle}deg) scale(${scale})`;
+    });
+  }
+
+  function openBookingSheet() {
+    document.getElementById('bk-img').src = currentItem.img;
+    document.getElementById('bk-title').textContent = currentItem.name;
+    document.getElementById('bk-cat').textContent = currentItem.category + ' • ' + currentItem.location;
+    document.getElementById('bk-err').textContent = '';
+    document.getElementById('bk-note').value = '';
+    buildRadialDial();
+    document.getElementById('sheet-overlay').classList.add('open');
+    document.getElementById('booking-sheet').classList.add('open');
+  }
+  function closeBookingSheet() { document.getElementById('sheet-overlay').classList.remove('open'); document.getElementById('booking-sheet').classList.remove('open'); }
+
+  function confirmBooking() {
+    const nameInput = document.getElementById('user-name').value.trim();
+    const deptInput = document.getElementById('user-dept').value.trim();
+    const endInput = document.getElementById('bk-time-end').value;
+    const note = document.getElementById('bk-note').value.trim();
+    const err = document.getElementById('bk-err');
+
+    if(!nameInput) { 
+      err.textContent = 'กรุณากลับไปหน้า "การจองของฉัน" เพื่อกรอกชื่อผู้จองก่อน'; 
+      setTimeout(()=>{ closeBookingSheet(); closeDetails(); switchTab('bookings'); }, 2000); return; 
     }
-  });
+    if(selectedStartTime >= endInput) { err.textContent = 'เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่ม'; return; }
 
-  // Handle Booking Submit (New Form)
-  document.getElementById('det-submit-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    if(!currentDetailItem) return;
-    
-    const formEl = document.getElementById('det-booking-form');
-    if(!formEl.checkValidity()) {
-      formEl.reportValidity();
-      return;
-    }
-
-    const errEl = document.getElementById('det-err');
-    const name = document.getElementById('det-name').value.trim();
-    const dept = document.getElementById('det-dept').value.trim();
-    const date = document.getElementById('det-date').value;
-    const start = document.getElementById('det-start').value;
-    const end = document.getElementById('det-end').value;
-    const note = document.getElementById('det-note').value.trim();
-
-    if(date < todayISO()){ errEl.textContent = 'ไม่สามารถเลือกวันที่ย้อนหลังได้'; return; }
-    if(start >= end){ errEl.textContent = 'เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่ม'; return; }
-    
-    const conflict = bookings.some(b=>
-      b.equipmentId === currentDetailItem.id && b.date === date && (start < b.end && end > b.start)
+    // Overlap Logic Check
+    const conflict = bookings.some(b => 
+      b.eqId === currentItem.id && b.date === selectedDate &&
+      (selectedStartTime < b.end && endInput > b.start)
     );
-    if(conflict){ errEl.textContent = 'เวลานี้มีคนจองไปแล้ว กรุณาเลือกเวลาอื่น'; return; }
+
+    if(conflict) { err.textContent = 'เวลานี้มีผู้จองแล้ว กรุณาเลือกเวลาอื่น'; return; }
 
     bookings.push({
-      id: uid(), equipmentId: currentDetailItem.id, equipmentName: currentDetailItem.name,
-      name, dept, date, start, end, note, createdAt: Date.now()
+      id: generateId(), eqId: currentItem.id, eqName: currentItem.name,
+      name: nameInput, dept: deptInput, date: selectedDate, 
+      start: selectedStartTime, end: endInput, note: note, createdAt: Date.now()
     });
     
     saveBookings();
-    localStorage.setItem('yd_user_name', name);
-    localStorage.setItem('yd_user_dept', dept);
-    document.getElementById('user-name').value = name;
-    document.getElementById('user-dept').value = dept;
     
-    closeDetailsModal();
-    showToast('จอง ' + currentDetailItem.name + ' สำเร็จ');
-    renderAll();
-  });
+    // เด้งออกไปหน้าแรก (Home) และเคลียร์ Modal ทุกหน้าจอ
+    closeBookingSheet(); 
+    closeDetails(); 
+    switchTab('home'); 
+    
+    // แจ้งเตือน Notification
+    showToast('🎉 จองอุปกรณ์สำเร็จเรียบร้อยแล้ว!<br><span style="font-size:12px; font-weight:400;">ตรวจสอบได้ที่แท็บ "การจองของฉัน"</span>');
+  }
 
+  /* ================= MY BOOKINGS ================= */
+  function renderMyBookings() {
+    const name = document.getElementById('user-name').value.trim().toLowerCase();
+    const cont = document.getElementById('my-bookings-list');
+    if(!name) { cont.innerHTML = `<div class="liquid-glass" style="text-align:center; padding:40px; color:var(--text-muted);">กรอกชื่อด้านบนเพื่อดูรายการจอง</div>`; return; }
 
-  /* ---------- Visual Calendar Renderer (Real-time tracking) ---------- */
+    const myBks = bookings.filter(b => b.name.toLowerCase().includes(name)).sort((a,b) => (a.date+a.start).localeCompare(b.date+b.start));
+    if(!myBks.length) { cont.innerHTML = `<div class="liquid-glass" style="text-align:center; padding:40px; color:var(--text-muted);">ไม่มีรายการจองอุปกรณ์</div>`; return; }
+
+    cont.innerHTML = myBks.map(b => {
+      const duration = getDurationText(b.start, b.end);
+      const countdown = getCountdownText(b.date, b.start, b.end);
+      return `
+      <div class="bk-card liquid-glass">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <h4 style="color:var(--primary-cyan); font-size:18px;">${b.eqName}</h4>
+          <button style="background:rgba(255,92,122,0.1); border:none; color:var(--danger); cursor:pointer; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600;" onclick="cancelBooking('${b.id}')">ยกเลิก</button>
+        </div>
+        <div class="bk-meta"><span class="lbl">วันที่:</span> <span style="color:var(--text-main);">${fmtDate(b.date)}</span></div>
+        <div class="bk-meta"><span class="lbl">เวลา:</span> <span style="color:var(--primary-purple-light); font-weight:700;">${b.start} - ${b.end} (จอง ${duration})</span></div>
+        <div class="bk-countdown">${countdown}</div>
+      </div>`
+    }).join('');
+  }
+  function cancelBooking(id) {
+    if(confirm('ยกเลิกการจองนี้?')) { bookings = bookings.filter(b => b.id !== id); saveBookings(); renderAll(); showToast('ยกเลิกสำเร็จ'); }
+  }
+
+  /* ================= CALENDAR ================= */
   function renderVisualCalendar() {
-    const calGrid = document.getElementById('visual-calendar');
-    const statsGrid = document.getElementById('real-stats-grid');
-    if(!calGrid) return;
+    const grid = document.getElementById('visual-calendar');
+    const statsGrid = document.getElementById('cal-stats');
+    if(!grid) return;
 
-    const todayStr = todayISO();
+    const todayStr = getTodayISO();
+    const d = new Date();
+    const y = d.getFullYear(); const m = d.getMonth();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const firstDay = new Date(y, m, 1).getDay();
+
     const todayBookings = bookings.filter(b => b.date === todayStr).length;
-    const uniqueUsers = new Set(bookings.map(b => b.name)).size;
-    
     if(statsGrid) {
       statsGrid.innerHTML = `
-        <div class="cal-stat-box"><div class="val">${bookings.length}</div><div class="lbl">การจองทั้งหมดในระบบ</div></div>
-        <div class="cal-stat-box"><div class="val">${todayBookings}</div><div class="lbl">รายการจองวันนี้</div></div>
-        <div class="cal-stat-box"><div class="val">${uniqueUsers}</div><div class="lbl">จำนวนพนักงานที่ใช้งาน</div></div>
+        <div class="stat-box liquid-glass"><div class="val" style="color:var(--primary-cyan);">${todayBookings}</div><div class="lbl">การจองวันนี้</div></div>
+        <div class="stat-box liquid-glass"><div class="val" style="color:var(--primary-purple-light);">${bookings.length}</div><div class="lbl">การจองสะสม (ทั้งหมด)</div></div>
       `;
     }
 
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth(); // 0-11
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay(); // (0=Sun)
-
-    const bookingsByDate = {};
-    bookings.forEach(b => {
-      if (!bookingsByDate[b.date]) bookingsByDate[b.date] = [];
-      bookingsByDate[b.date].push(b);
-    });
+    const monthNames = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+    document.getElementById('cal-month-year').textContent = `${monthNames[m]} ${y+543}`;
 
     let html = '';
-    const dayNames = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
-    dayNames.forEach(d => {
-      html += `<div style="color:var(--ink-faint); font-size:12px; font-weight:700; height:auto; padding-bottom:8px;">${d}</div>`;
-    });
-
-    for(let i=0; i<firstDay; i++) { html += `<div></div>`; }
+    ['อา','จ','อ','พ','พฤ','ศ','ส'].forEach(day => html += `<div class="cal-day-name">${day}</div>`);
+    for(let i=0; i<firstDay; i++) html += `<div></div>`;
 
     for (let i = 1; i <= daysInMonth; i++) {
-      let num = i.toString().padStart(2, '0');
-      let m = (month + 1).toString().padStart(2, '0');
-      let dateStr = `${year}-${m}-${num}`;
-      let classes = 'cal-day modal-cal-day span-single';
-      
-      const dayBookings = bookingsByDate[dateStr] || [];
-      if (dayBookings.length > 0) classes += ' cal-bg-blue'; 
-
-      html += `<div class="${classes}" data-view-date="${dateStr}" style="cursor:pointer; font-weight:500; border-radius:24px;">${num}</div>`;
+      let dt = new Date(y, m, i); dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset());
+      let dateStr = dt.toISOString().slice(0,10);
+      let cls = 'cal-day';
+      if(dateStr === todayStr) cls += ' active';
+      if(bookings.some(b => b.date === dateStr)) cls += ' has-booking';
+      html += `<div class="${cls}" onclick="showDayDetails('${dateStr}')">${i}</div>`;
     }
-    calGrid.innerHTML = html;
+    grid.innerHTML = html;
+    showDayDetails(todayStr); // Auto show today
   }
 
-  const calGridElement = document.getElementById('visual-calendar');
-  if(calGridElement) {
-    calGridElement.addEventListener('click', (e) => {
-      const dayDiv = e.target.closest('.modal-cal-day');
-      if (!dayDiv) return;
-
-      const dateStr = dayDiv.dataset.viewDate;
-      const detailsBox = document.getElementById('day-booking-details');
-      const dayBookings = bookings.filter(b => b.date === dateStr).sort((a,b) => a.start.localeCompare(b.start));
-      const dObj = new Date(dateStr);
-      const formattedDate = dObj.toLocaleDateString('th-TH', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-
-      if (dayBookings.length === 0) {
-        detailsBox.innerHTML = `
-          <h4 style="margin-bottom:8px; font-size:16px;">${formattedDate}</h4>
-          <p style="color:var(--ink-soft); font-size:14px; margin:0;">ไม่มีการจองอุปกรณ์ในวันนี้</p>
-        `;
-      } else {
-        let listHtml = dayBookings.map(b => `
-          <div style="padding: 14px; background: var(--surface); border: 1.5px solid var(--line-strong); border-radius: 8px; margin-bottom: 10px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px; flex-wrap:wrap; gap:8px;">
-              <strong style="color:var(--ink); font-size:15px;">${b.equipmentName}</strong>
-              <span style="font-size:13.5px; font-weight:700; color:#3855F6; background:#EAF3FF; padding:4px 10px; border-radius:20px;">
-                ${b.start} - ${b.end} น.
-              </span>
-            </div>
-            <div style="font-size:13.5px; color:var(--ink-soft);">
-              จองโดย: <strong style="color:var(--ink);">${b.name}</strong> ${b.dept ? `<span style="font-size:12px;">(แผนก: ${b.dept})</span>` : ''}
-            </div>
-            ${b.note ? `<div style="font-size:12px; color:var(--ink-faint); margin-top:6px; background:var(--surface-2); padding:6px 10px; border-radius:6px;">หมายเหตุ: ${b.note}</div>` : ''}
+  function showDayDetails(dateStr) {
+    const detailsBox = document.getElementById('day-booking-details');
+    const dayBks = bookings.filter(b => b.date === dateStr).sort((a,b) => a.start.localeCompare(b.start));
+    
+    if (!dayBks.length) {
+      detailsBox.innerHTML = `<h4 style="color:var(--primary-cyan); margin-bottom:10px;">คิววันที่ ${fmtDate(dateStr)}</h4><p style="color:var(--text-muted); font-size:14px; text-align:center; padding: 20px 0;">ไม่มีคิวจองในวันนี้</p>`;
+    } else {
+      let listHtml = dayBks.map(b => {
+        const duration = getDurationText(b.start, b.end);
+        const countdown = getCountdownText(b.date, b.start, b.end);
+        return `
+        <div style="padding:16px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:16px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+            <strong style="font-size:15px; color:var(--text-main);">${b.eqName}</strong>
+            <span style="font-size:12px; color:var(--text-dark); font-weight:700; background:var(--primary-purple-light); padding:4px 12px; border-radius:20px;">
+              ${b.start} - ${b.end}
+            </span>
           </div>
-        `).join('');
-
-        detailsBox.innerHTML = `<h4 style="margin-bottom:14px; font-size:16px;">คิวการจองวันที่ ${formattedDate}</h4>${listHtml}`;
-      }
-    });
+          <div style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">จองโดย: <span style="color:var(--text-main);">${b.name}</span> (เวลา ${duration})</div>
+          <div style="font-size:12.5px; font-weight:500;">${countdown}</div>
+        </div>`
+      }).join('');
+      detailsBox.innerHTML = `<h4 style="color:var(--primary-cyan); margin-bottom:16px;">คิววันที่ ${fmtDate(dateStr)}</h4>${listHtml}`;
+    }
   }
 
-  /* ---------- Render orchestrator ---------- */
-  function renderAll(){
-    renderHome(); renderEquipment(); renderBookings(); renderAdmin(); renderVisualCalendar();
+  /* ================= ADMIN ================= */
+  function promptAdmin() {
+    if (isAdmin) { switchTab('admin'); return; }
+    if (prompt('รหัสผ่านผู้ดูแลระบบ (admin123):') === 'admin123') {
+      isAdmin = true; sessionStorage.setItem('yd_admin', 'true');
+      updateAdminUI(); switchTab('admin'); showToast('เข้าสู่ระบบ Admin แล้ว');
+    }
   }
-  
-  renderAll();
+  function logoutAdmin() { isAdmin = false; sessionStorage.removeItem('yd_admin'); updateAdminUI(); switchTab('home'); showToast('ออกจากระบบ Admin'); }
+  function updateAdminUI() { if (isAdmin) document.body.classList.add('is-admin'); else document.body.classList.remove('is-admin'); }
 
-  // Sync การจองแบบ Real-time ข้าม Tab
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'yd_bookings') { bookings = safeParse(e.newValue) || []; renderAll(); }
-  });
+  function renderAdmin() {
+    if (!isAdmin) return;
+    const statsRow = document.getElementById('admin-stats-row');
+    const uUsers = new Set(bookings.map(b=>b.name)).size;
+    statsRow.innerHTML = `
+      <div class="stat-box liquid-glass"><div class="val" style="color:var(--danger);">${bookings.length}</div><div class="lbl">รวมการจอง (ครั้ง)</div></div>
+      <div class="stat-box liquid-glass"><div class="val" style="color:var(--primary-purple-light);">${uUsers}</div><div class="lbl">พนักงานที่ใช้งาน</div></div>
+    `;
 
-})();
+    const tbody = document.getElementById('admin-bookings-table');
+    const sorted = [...bookings].sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+    tbody.innerHTML = sorted.length ? sorted.map(b => `
+      <tr>
+        <td><strong style="color:var(--primary-cyan);">${b.name}</strong><br><span style="font-size:12px; color:var(--text-muted);">${b.dept || '-'}</span></td>
+        <td><strong style="color:var(--text-main);">${b.eqName}</strong><br><span style="font-size:12px; color:var(--text-muted);">${b.eqId}</span></td>
+        <td>${fmtDate(b.date)}<br><span style="font-size:12px; color:var(--primary-purple-light);">${b.start} - ${b.end} น.</span></td>
+        <td><button class="btn-danger-text" onclick="deleteAdmin('${b.id}')">ลบ</button></td>
+      </tr>
+    `).join('') : `<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่มีข้อมูลในระบบ</td></tr>`;
+  }
+  function deleteAdmin(id) { if(confirm('แอดมิน: ยืนยันการลบข้อมูลนี้ออกจากฐานข้อมูล?')) { bookings = bookings.filter(b=> b.id !== id); saveBookings(); renderAll(); showToast('ลบข้อมูลสำเร็จ'); } }
+
+  window.addEventListener('storage', (e) => { if (e.key === 'yd_bookings_v7') { bookings = safeParse(e.newValue) || []; renderAll(); }});
+  init();
+
 </script>
 </body>
 </html>
