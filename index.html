@@ -12,7 +12,6 @@
 <style>
   /* ===================== TOKENS & VARIABLES ===================== */
   :root {
-    /* Liquid Glass Theme Colors */
     --bg-dark-1: #131939;
     --bg-dark-2: #282049;
     --primary-purple: #926bf8;
@@ -273,95 +272,6 @@
   }
   .input-dark:focus { border-color: var(--primary-purple-light); }
 
-  /* ===================== THE RADIAL DIAL UI ===================== */
-  .dial-wrapper {
-    position: relative;
-    background: var(--dial-bg);
-    border-radius: 40px;
-    padding-top: 24px;
-    margin-bottom: 24px;
-    overflow: hidden;
-    height: 380px; 
-    box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.05);
-  }
-  
-  .dial-wrapper::before {
-    content: ''; position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%);
-    width: 450px; height: 450px; border-radius: 50%;
-    background: var(--dial-bg-inner);
-    z-index: 0; box-shadow: 0 -10px 20px rgba(0,0,0,0.3);
-  }
-
-  .scroll-track {
-    display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-    scrollbar-width: none; position: relative; z-index: 2;
-    align-items: flex-start;
-  }
-  .scroll-track::-webkit-scrollbar { display: none; }
-  
-  /* Date Track */
-  #date-track { height: 160px; padding: 0 calc(50% - 38px); }
-  .date-item {
-    flex: 0 0 76px; height: 96px; background: #3a3a3c; border-radius: 20px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: #a1a1aa; scroll-snap-align: center; margin: 0 6px;
-    /* เปลี่ยนมารองรับ JS ควบคุมล้วนๆ ตัดเรื่อง transform ออกจาก transition เพื่อป้องกันการสั่น */
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s, opacity 0.2s;
-    opacity: 0.6;
-    will-change: transform;
-  }
-  .date-item.active { 
-    background: #ffffff; color: #000000; box-shadow: 0 10px 20px rgba(255,255,255,0.2); 
-    opacity: 1;
-  }
-  .date-item .dt-icon { width: 14px; height: 14px; margin-bottom: 4px; opacity: 0.7; }
-  .date-item .dt-top { font-size: 12px; margin-bottom: 2px; font-weight: 500; font-family: var(--font-en);}
-  .date-item .dt-bot { font-size: 22px; font-weight: 800; font-family: var(--font-en); }
-
-  /* Time Track */
-  #time-track { height: 80px; margin-top: -10px; padding: 0 calc(50% - 40px); }
-  .time-item {
-    flex: 0 0 80px; height: 60px; background: transparent; border-radius: 16px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: #a1a1aa; scroll-snap-align: center; margin: 0 4px;
-    /* ตัด transform ออกจาก transition เพื่อให้เลื่อนเนียนเป็นครึ่งวงกลม */
-    transition: color 0.2s, opacity 0.2s;
-    opacity: 0.6;
-    will-change: transform;
-  }
-  .time-item.active { 
-    color: var(--text-dark); font-weight: 700; position: relative; z-index: 3;
-    opacity: 1;
-  }
-  .time-item .tm-val { font-size: 15px; font-family: var(--font-en); margin-bottom: 2px;}
-  .time-item .tm-ampm { font-size: 11px; font-weight: 600; font-family: var(--font-en);}
-
-  /* The Purple Wedge for active time */
-  .time-wedge {
-    position: absolute; bottom: 122px; left: 50%; transform: translateX(-50%);
-    width: 70px; height: 50px; background: var(--primary-purple-light);
-    clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
-    border-radius: 6px; z-index: 1; pointer-events: none;
-  }
-  .time-wedge::before {
-    content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
-    border-left: 6px solid transparent; border-right: 6px solid transparent;
-    border-bottom: 6px solid var(--primary-purple-light);
-  }
-
-  /* Big Circular Confirm Button inside Dial */
-  .btn-circle-confirm {
-    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-    width: 64px; height: 64px; border-radius: 50%; background: var(--primary-purple-light);
-    color: var(--text-dark); display: flex; align-items: center; justify-content: center;
-    border: none; cursor: pointer; z-index: 10;
-    box-shadow: 0 10px 20px rgba(181, 160, 255, 0.3); transition: 0.2s;
-  }
-  .btn-circle-confirm:active { transform: translateX(-50%) scale(0.92); }
-  .btn-circle-confirm svg { width: 28px; height: 28px; }
-
-  /* End Time Input */
   .end-time-row {
     display: flex; justify-content: space-between; align-items: center;
     margin: 0 24px 20px; padding: 12px 20px; background: rgba(0,0,0,0.3);
@@ -374,6 +284,70 @@
   }
   
   .err-msg { color: var(--danger); font-size: 13px; text-align: center; min-height: 18px; margin-bottom: 10px; }
+
+  /* ===================== THE RADIAL DIAL UI (VISION OS STYLE) ===================== */
+  .dial-wrapper {
+    position: relative; background: var(--dial-bg); border-radius: 40px; padding-top: 10px;
+    margin-bottom: 24px; overflow: hidden; height: 380px; 
+    box-shadow: inset 0 10px 20px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .dial-wrapper::before {
+    content: ''; position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%);
+    width: 450px; height: 450px; border-radius: 50%; background: var(--dial-bg-inner);
+    z-index: 0; box-shadow: 0 -10px 20px rgba(0,0,0,0.3);
+  }
+
+  /* เปลี่ยนจาก Scroll Native เป็น Relative Layout เพื่อให้ JS ควบคุมตำแหน่งแบบ 3D/Circular */
+  .scroll-track { position: relative; z-index: 2; touch-action: none; overflow: visible; display: block; width: 100%; }
+  
+  /* Date Track */
+  #date-track { height: 160px; margin-top: 20px; }
+  .date-item {
+    position: absolute; left: 50%; bottom: -40px; /* จุดหมุนอยู่ที่ด้านล่างจอ */
+    width: 76px; height: 96px; background: #222224; border-radius: 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #a1a1aa; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;
+    /* Transition เฉพาะสีและเงา ส่วน Transform, Opacity, Filter ปล่อย JS จัดการล้วนๆ 60fps */
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s;
+    will-change: transform, opacity, filter;
+  }
+  .date-item.active { background: #ffffff; color: #000000; box-shadow: 0 0 24px rgba(255,255,255,0.5); font-weight: 700; border-color: transparent;}
+  .date-item .dt-icon { width: 14px; height: 14px; margin-bottom: 4px; opacity: 0.7; }
+  .date-item .dt-top { font-size: 12px; margin-bottom: 2px; font-weight: 600; font-family: var(--font-en);}
+  .date-item .dt-bot { font-size: 22px; font-weight: 800; font-family: var(--font-en); }
+
+  /* Time Track */
+  #time-track { height: 80px; margin-top: 10px; }
+  .time-item {
+    position: absolute; left: 50%; bottom: -60px; cursor: pointer;
+    width: 80px; height: 60px; border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #a1a1aa; 
+    transition: color 0.2s;
+    will-change: transform, opacity, filter;
+  }
+  .time-item.active { color: var(--text-main); font-weight: 700; }
+  .time-item .tm-val { font-size: 15px; font-family: var(--font-en); margin-bottom: 2px;}
+  .time-item .tm-ampm { font-size: 11px; font-weight: 600; font-family: var(--font-en);}
+
+  /* The Purple Wedge */
+  .time-wedge {
+    position: absolute; bottom: 122px; left: 50%; transform: translateX(-50%);
+    width: 70px; height: 50px; background: rgba(181, 160, 255, 0.15);
+    border: 1px solid var(--primary-purple-light); border-radius: 12px;
+    z-index: 1; pointer-events: none;
+  }
+
+  .btn-circle-confirm {
+    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+    width: 64px; height: 64px; border-radius: 50%; background: var(--primary-purple-light);
+    color: var(--text-dark); display: flex; align-items: center; justify-content: center;
+    border: none; cursor: pointer; z-index: 10;
+    box-shadow: 0 10px 20px rgba(181, 160, 255, 0.3); transition: 0.2s;
+  }
+  .btn-circle-confirm:active { transform: translateX(-50%) scale(0.92); }
+  .btn-circle-confirm svg { width: 28px; height: 28px; }
 
   /* ===================== CALENDAR VIEW ===================== */
   .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 24px 24px; }
@@ -398,18 +372,11 @@
   .day-details { margin: 24px 24px 0; padding: 20px; min-height: 120px; }
 
   /* ===================== MY BOOKINGS & ADMIN ===================== */
-  .bk-card {
-    padding: 20px; margin-bottom: 16px; position: relative;
-    border: 1px solid rgba(255,255,255,0.08);
-  }
+  .bk-card { padding: 20px; margin-bottom: 16px; position: relative; border: 1px solid rgba(255,255,255,0.08); }
   .bk-card h4 { font-size: 18px; color: var(--primary-cyan); margin-bottom: 10px; }
   .bk-meta { font-size: 13.5px; color: var(--text-main); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;}
   .bk-meta span.lbl { color: var(--text-muted); width: 40px; }
-  .bk-countdown { 
-    display: inline-block; padding: 6px 14px; border-radius: var(--radius-pill); 
-    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
-    font-size: 12.5px; margin-top: 12px; font-weight: 500;
-  }
+  .bk-countdown { display: inline-block; padding: 6px 14px; border-radius: var(--radius-pill); background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); font-size: 12.5px; margin-top: 12px; font-weight: 500; }
 
   .admin-table-wrapper { overflow-x: auto; margin: 0 24px; border: 1px solid rgba(255,255,255,0.05); }
   .admin-table { width: 100%; border-collapse: collapse; min-width: 600px; }
@@ -855,110 +822,187 @@
   }
   function closeDetails() { document.getElementById('details-modal').classList.remove('open'); }
 
-  /* ================= RADIAL DIAL LOGIC ================= */
+  /* ================= APPLE VISION OS STYLE PHYSICS ENGINE ================= */
+  
+  let dialRafId = null;
+  let activeDials = [];
+
+  function createArcDial(config) {
+    const container = document.getElementById(config.containerId);
+    container.innerHTML = '';
+    const elements = [];
+    
+    // สร้าง DOM และแนบ Event Click ให้วิ่งเข้าตรงกลางทันที
+    config.items.forEach((item, i) => {
+      let el = document.createElement('div');
+      el.className = config.itemClass;
+      el.innerHTML = item.html;
+      el.dataset.val = item.val;
+      el.addEventListener('click', () => {
+        if (Math.abs(state.velocity) > 0.5) return; // หากหมุนเร็วๆ อยู่ให้ไม่รับ Click
+        state.scroll = i; 
+        state.velocity = 0;
+      });
+      container.appendChild(el);
+      elements.push(el);
+    });
+
+    let state = {
+      scroll: config.initialIndex || 0,
+      velocity: 0,
+      isDragging: false,
+      startX: 0,
+      startScroll: 0,
+      lastX: 0,
+      lastTime: 0
+    };
+
+    // ลากนิ้วควบคุม (Drag Physics)
+    function getX(e) { return e.type.includes('mouse') ? e.pageX : e.touches[0].clientX; }
+    function onStart(e) {
+      state.isDragging = true;
+      state.startX = getX(e);
+      state.lastX = state.startX;
+      state.startScroll = state.scroll;
+      state.lastTime = Date.now();
+      state.velocity = 0;
+    }
+    function onMove(e) {
+      if (!state.isDragging) return;
+      e.preventDefault(); 
+      let x = getX(e);
+      let dx = x - state.startX;
+      
+      // ปรับความไวการลาก
+      state.scroll = state.startScroll - dx * 0.015; 
+      
+      let now = Date.now();
+      let dt = Math.max(1, now - state.lastTime);
+      state.velocity = -(x - state.lastX) * 0.015 / (dt / 16); 
+      
+      state.lastX = x;
+      state.lastTime = now;
+    }
+    function onEnd() { state.isDragging = false; }
+
+    container.addEventListener('mousedown', onStart);
+    window.addEventListener('mousemove', onMove, {passive: false});
+    window.addEventListener('mouseup', onEnd);
+    container.addEventListener('touchstart', onStart, {passive: false});
+    window.addEventListener('touchmove', onMove, {passive: false});
+    window.addEventListener('touchend', onEnd);
+
+    // ทำงานทุกเฟรม (60FPS Frame Render)
+    return function updateFrame() {
+      const maxIndex = config.items.length - 1;
+
+      if (!state.isDragging) {
+        // ไหลลื่น (Momentum) + แรงเสียดทาน (Friction)
+        state.scroll += state.velocity;
+        state.velocity *= 0.92; 
+
+        // Snap ดึงกลับเข้าสู่ศูนย์กลาง
+        if (Math.abs(state.velocity) < 0.05) {
+          let target = Math.round(state.scroll);
+          target = Math.max(0, Math.min(maxIndex, target)); // ป้องกันหลุดขอบซ้ายขวา
+          let diff = target - state.scroll;
+          state.scroll += diff * 0.15; // Spring Tension
+          state.velocity = 0;
+          
+          if (Math.abs(diff) < 0.01) {
+            state.scroll = target;
+            if (config.onSelect) config.onSelect(config.items[target].val);
+          }
+        }
+      } else {
+        // ดึงเกินขอบให้หนืด (Soft Boundary Edge)
+        if (state.scroll < -0.5) state.scroll += (-0.5 - state.scroll) * 0.5;
+        if (state.scroll > maxIndex + 0.5) state.scroll += (maxIndex + 0.5 - state.scroll) * 0.5;
+      }
+
+      // Render ทีละกล่อง
+      elements.forEach((el, i) => {
+        let offset = i - state.scroll;
+        let angle = offset * config.anglePerItem;
+        let dist = Math.abs(offset);
+
+        // Apple VisionOS Style Math
+        // 1. ขนาดเล็กลงเมื่อออกห่าง 
+        let scale = Math.max(0.7, 1.15 - dist * 0.20);
+        
+        // 2. ความทึบแสงจางลงเมื่อออกห่าง
+        let opacity = Math.max(0, 1 - dist * 0.5);
+        
+        // 3. เบลอขอบ
+        let blur = dist * 1.5; 
+
+        // 4. สมการคณิตศาสตร์หลักวงกลม: ดันรัศมี, หมุน, หมุนกลับให้ข้อความตั้งตรง 100% เสมอ
+        el.style.transform = `translate(-50%, 0) rotate(${angle}deg) translateY(${-config.radius}px) rotate(${-angle}deg) scale(${scale})`;
+        el.style.opacity = opacity;
+        el.style.filter = `blur(${blur}px)`;
+
+        // Highlight ตัวที่อยู่ตรงกลาง
+        if (dist < 0.3) el.classList.add('active');
+        else el.classList.remove('active');
+      });
+    };
+  }
+
   function buildRadialDial() {
-    // 1. Build Dates
-    const dCont = document.getElementById('date-track');
+    if (dialRafId) cancelAnimationFrame(dialRafId);
+    activeDials = [];
+
+    // เตรียมข้อมูล Date (14 วันล่วงหน้า)
     const daysTh = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
-    let dHtml = '';
+    let dateItems = [];
     for(let i=0; i<14; i++) {
-      let d = new Date(); d.setDate(d.getDate() + i);
+      let d = new Date(); d.setDate(d.getDate() + i); 
       d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
       let iso = d.toISOString().slice(0,10);
       if(i===0) selectedDate = iso;
-      dHtml += `<div class="date-item" data-val="${iso}">
-                  <svg class="dt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                  <div class="dt-top">${daysTh[d.getDay()]}</div><div class="dt-bot">${d.getDate()}</div>
-                </div>`;
+      dateItems.push({ val: iso, html: `
+        <svg class="dt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <div class="dt-top">${daysTh[d.getDay()]}</div><div class="dt-bot">${d.getDate()}</div>
+      `});
     }
-    dCont.innerHTML = dHtml;
 
-    // 2. Build Times
-    const tCont = document.getElementById('time-track');
-    let tHtml = '';
+    // เตรียมข้อมูล Time (08:00 - 18:00)
+    let timeItems = [];
     for(let i=8; i<=18; i++) {
-      let h = i < 10 ? `0${i}` : `${i}`;
-      let t = `${h}:00`;
+      let val = `${i < 10 ? '0'+i : i}:00`;
       let ampm = i < 12 ? 'AM' : 'PM';
-      let h12 = i > 12 ? i - 12 : i;
-      let displayTime = `${h12 < 10 ? '0'+h12 : h12}:00`;
-
-      tHtml += `<div class="time-item" data-val="${t}">
-                  <div class="tm-val">${displayTime}</div>
-                  <div class="tm-ampm">${ampm}</div>
-                </div>`;
+      let displayTime = `${i > 12 ? (i-12 < 10 ? '0'+(i-12) : i-12) : (i < 10 ? '0'+i : i)}:00`;
+      timeItems.push({ val: val, html: `<div class="tm-val">${displayTime}</div><div class="tm-ampm">${ampm}</div>` });
     }
-    tCont.innerHTML = tHtml;
 
-    // Attach Scroll Events for Curve Calculation
-    dCont.addEventListener('scroll', () => updateCurve(dCont, 350, 'date-item'));
-    tCont.addEventListener('scroll', () => updateCurve(tCont, 220, 'time-item'));
-    
-    // Allow clicking to scroll to center
-    dCont.querySelectorAll('.date-item').forEach(el => el.addEventListener('click', () => centerItem(el)));
-    tCont.querySelectorAll('.time-item').forEach(el => el.addEventListener('click', () => centerItem(el)));
+    // ติดตั้งโค้งสำหรับวันที่
+    activeDials.push(createArcDial({
+      containerId: 'date-track',
+      items: dateItems,
+      initialIndex: 0,
+      radius: 190,           // รัศมีความโค้ง
+      anglePerItem: 18,      // องศาห่างระหว่างกล่อง
+      itemClass: 'date-item',
+      onSelect: (val) => { selectedDate = val; }
+    }));
 
-    // Init position
-    setTimeout(() => {
-      centerItem(dCont.children[0]);
-      centerItem(tCont.children[1]); // 09:00
-      document.getElementById('bk-time-end').value = '10:00';
-    }, 50);
-  }
+    // ติดตั้งโค้งสำหรับเวลา
+    activeDials.push(createArcDial({
+      containerId: 'time-track',
+      items: timeItems,
+      initialIndex: 1,       // เริ่มที่ 09:00
+      radius: 140,
+      anglePerItem: 22,
+      itemClass: 'time-item',
+      onSelect: (val) => { selectedStartTime = val; }
+    }));
 
-  function centerItem(el) {
-    el.scrollIntoView({behavior: "smooth", block: "nearest", inline: "center"});
-  }
-
-  // ใช้คณิตศาสตร์คำนวณโค้งครึ่งวงกลม และ Apply ผ่าน JS ทันที (ไร้ความหน่วง)
-  function updateCurve(container, radius, itemClass) {
-    const containerCenter = container.scrollLeft + container.offsetWidth / 2;
-    const items = container.querySelectorAll('.' + itemClass);
-    let minDx = Infinity;
-    let closestItem = null;
-
-    // หา Item ที่อยู่ใกล้ตรงกลางที่สุดก่อน
-    items.forEach(item => {
-      const itemCenter = item.offsetLeft + (item.offsetWidth / 2);
-      const dx = itemCenter - containerCenter;
-      
-      if (Math.abs(dx) < minDx) {
-        minDx = Math.abs(dx);
-        closestItem = item;
-      }
-    });
-
-    // วนลูปปรับระยะโค้งทีละกล่อง
-    items.forEach(item => {
-      const itemCenter = item.offsetLeft + (item.offsetWidth / 2);
-      const dx = itemCenter - containerCenter;
-      
-      // ลิมิต dx ไม่ให้เกินรัศมี เพื่อป้องกันสมการ Math.sqrt ขัดข้อง
-      const cappedDx = Math.max(-radius, Math.min(radius, dx));
-      
-      // คำนวณแกน Y เพื่อสร้างความโค้ง (y = R - sqrt(R^2 - x^2))
-      const yOffset = radius - Math.sqrt(radius * radius - cappedDx * cappedDx);
-      
-      // คำนวณองศาหมุนให้หันเข้าหาจุดศูนย์กลาง
-      const angle = (cappedDx / radius) * 45; 
-      
-      const isActive = (item === closestItem);
-      if (isActive) {
-        item.classList.add('active');
-        if(itemClass === 'date-item') selectedDate = item.dataset.val;
-        if(itemClass === 'time-item') selectedStartTime = item.dataset.val;
-      } else {
-        item.classList.remove('active');
-      }
-
-      // ปรับขนาด Scale ของ Item ตรงกลาง
-      const scale = isActive ? (itemClass === 'date-item' ? 1.08 : 1.15) : 0.9;
-      // ลดแกน Y ลงเล็กน้อยสำหรับตัวที่ Active เพื่อให้มันเด้งออกมาชัดขึ้น
-      const activePop = isActive ? (itemClass === 'date-item' ? -5 : -3) : 0;
-      
-      // บังคับ Transform ตรงๆ ผ่าน JS เฟรมต่อเฟรม (ไม่ต้องผ่าน CSS Transition) = สมูท 100%
-      item.style.transform = `translateY(${yOffset + activePop}px) rotate(${angle}deg) scale(${scale})`;
-    });
+    // วงจร Animation Loop (60FPS)
+    function animate() {
+      activeDials.forEach(update => update());
+      dialRafId = requestAnimationFrame(animate);
+    }
+    animate();
   }
 
   function openBookingSheet() {
@@ -967,11 +1011,18 @@
     document.getElementById('bk-cat').textContent = currentItem.category + ' • ' + currentItem.location;
     document.getElementById('bk-err').textContent = '';
     document.getElementById('bk-note').value = '';
+    
+    // เรียกสร้าง UI Dial
     buildRadialDial();
+    
     document.getElementById('sheet-overlay').classList.add('open');
     document.getElementById('booking-sheet').classList.add('open');
   }
-  function closeBookingSheet() { document.getElementById('sheet-overlay').classList.remove('open'); document.getElementById('booking-sheet').classList.remove('open'); }
+  
+  function closeBookingSheet() { 
+    document.getElementById('sheet-overlay').classList.remove('open'); 
+    document.getElementById('booking-sheet').classList.remove('open'); 
+  }
 
   function confirmBooking() {
     const nameInput = document.getElementById('user-name').value.trim();
@@ -986,7 +1037,6 @@
     }
     if(selectedStartTime >= endInput) { err.textContent = 'เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่ม'; return; }
 
-    // Overlap Logic Check
     const conflict = bookings.some(b => 
       b.eqId === currentItem.id && b.date === selectedDate &&
       (selectedStartTime < b.end && endInput > b.start)
@@ -1002,12 +1052,10 @@
     
     saveBookings();
     
-    // เด้งออกไปหน้าแรก (Home) และเคลียร์ Modal ทุกหน้าจอ
+    // ปิดหน้าจอและกลับหน้าแรกอัตโนมัติ
     closeBookingSheet(); 
     closeDetails(); 
     switchTab('home'); 
-    
-    // แจ้งเตือน Notification
     showToast('🎉 จองอุปกรณ์สำเร็จเรียบร้อยแล้ว!<br><span style="font-size:12px; font-weight:400;">ตรวจสอบได้ที่แท็บ "การจองของฉัน"</span>');
   }
 
