@@ -101,8 +101,8 @@
   html[data-theme="colorful"] .md-bottom-bar,
   html[data-theme="colorful"] .md-rules-box,
   html[data-theme="colorful"] .btn-ghost,
-  html[data-theme="colorful"] .date-item,
-  html[data-theme="colorful"] .time-wedge,
+  html[data-theme="colorful"] .carousel-item,
+  html[data-theme="colorful"] .carousel-wrapper,
   html[data-theme="colorful"] .toast,
   html[data-theme="colorful"] .dash-card,
   html[data-theme="colorful"] .otp-card {
@@ -544,53 +544,81 @@
   
   footer{padding:30px 0 50px; text-align:center; color:var(--ink-faint); font-size:12.5px;}
 
-  /* ===================== THE RADIAL DIAL UI (VISION OS STYLE) ===================== */
-  .dial-wrapper {
-    position: relative; background: var(--surface-2); border-radius: 24px;
-    margin-bottom: 24px; overflow: hidden; height: 320px; padding: 0;
-    box-shadow: inset 0 4px 12px rgba(0,0,0,0.05); border: 1.5px solid var(--line);
+  /* ===================== THE CAROUSEL UI (VIDEO STYLE) ===================== */
+  .carousel-wrapper {
+    position: relative;
+    height: 140px; /* Space for date card */
+    background: var(--surface-2);
+    border-radius: 20px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    border: 1.5px solid var(--line);
+    box-shadow: inset 0 4px 12px rgba(0,0,0,0.05);
+    cursor: grab;
+    touch-action: pan-y; /* Allows vertical page scroll, captures horizontal */
   }
-  
-  .dial-wrapper::before {
-    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 450px; height: 450px; border-radius: 50%; background: var(--surface);
-    z-index: 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+  .carousel-wrapper:active {
+    cursor: grabbing;
   }
-
-  .scroll-track { position: absolute; z-index: 2; touch-action: none; overflow: visible; display: block; width: 100%; }
-  
-  #date-track { top: 0; height: 130px; }
-  .date-item {
-    position: absolute; left: 50%; top: 200px; /* จุดศูนย์กลาง Y */
-    margin-left: -38px; margin-top: -48px;
-    width: 76px; height: 96px; background: var(--surface-3); border-radius: 20px;
+  .carousel-wrapper.short-carousel {
+    height: 100px; /* Space for time card */
+  }
+  .scroll-track { 
+    position: absolute; 
+    z-index: 2; 
+    width: 100%; 
+    height: 100%; 
+    top: 0; left: 0;
+  }
+  .carousel-item {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 76px; height: 96px; 
+    background: var(--surface-3);
+    border-radius: 16px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: var(--ink-faint); border: 1.5px solid var(--line); cursor: pointer;
-    will-change: transform, opacity, filter;
+    color: var(--ink-faint); border: 1.5px solid var(--line);
+    will-change: transform, opacity, z-index;
+    transition: background 0.2s, color 0.2s;
   }
-  .date-item.active { background: var(--ink); color: var(--bg); box-shadow: 0 4px 16px rgba(0,0,0,0.1); font-weight: 700; border-color: transparent;}
-  .date-item .dt-icon { width: 14px; height: 14px; margin-bottom: 4px; opacity: 0.7; }
-  .date-item .dt-top { font-size: 12px; margin-bottom: 2px; font-weight: 600; font-family: var(--font-en, sans-serif);}
-  .date-item .dt-bot { font-size: 22px; font-weight: 800; font-family: var(--font-en, sans-serif); }
-
-  #time-track { top: 130px; height: 170px; }
-  .time-item {
-    position: absolute; left: 50%; top: 70px; /* 200 - 130 = 70 */
-    margin-left: -40px; margin-top: -30px;
-    width: 80px; height: 60px; border-radius: 16px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: var(--ink-faint); cursor: pointer;
-    will-change: transform, opacity, filter;
+  .carousel-item.time-card {
+    width: 80px; height: 60px;
   }
-  .time-item.active { color: var(--ink); font-weight: 700; }
-  .time-item .tm-val { font-size: 15px; font-family: var(--font-en, sans-serif); margin-bottom: 2px;}
-  .time-item .tm-ampm { font-size: 11px; font-weight: 600; font-family: var(--font-en, sans-serif);}
-
-  .time-wedge {
-    position: absolute; left: 50%; top: 92px; /* Active Y(120) - Half Height(28) = 92px */
-    transform: translateX(-50%); width: 76px; height: 56px; 
-    background: var(--chip-avail-bg); border: 1.5px solid var(--chip-avail-ink); 
-    border-radius: 14px; z-index: 1; pointer-events: none; opacity: 0.7;
+  .carousel-item.active {
+    background: var(--ink); color: var(--bg);
+    border-color: var(--ink); font-weight: 700;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  }
+  html[data-theme="colorful"] .carousel-item.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: var(--accent-ink);
+    border-color: transparent;
+  }
+  .carousel-item .dt-icon { width: 14px; height: 14px; margin-bottom: 4px; opacity: 0.7; }
+  .carousel-item .dt-top { font-size: 12px; margin-bottom: 2px; font-weight: 600; font-family: var(--font-display);}
+  .carousel-item .dt-bot { font-size: 24px; font-weight: 800; font-family: var(--font-display); line-height:1; }
+  .carousel-item .tm-val { font-size: 18px; font-weight: 700; font-family: var(--font-display); margin-bottom: 2px;}
+  .carousel-item .tm-ampm { font-size: 13px; font-weight: 500; font-family: var(--font-display);}
+  
+  /* Central target wedge behind the active item */
+  .carousel-center-wedge {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 84px; height: 104px;
+    background: var(--chip-avail-bg);
+    border: 1.5px solid var(--chip-avail-ink);
+    border-radius: 18px;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .short-carousel .carousel-center-wedge {
+    width: 88px; height: 68px;
+    border-radius: 18px;
+  }
+  .end-time-wrapper .carousel-center-wedge {
+    background: var(--chip-busy-bg);
+    border-color: var(--chip-busy-ink);
   }
 
   /* ===================== Modern OTP Modal ===================== */
@@ -749,8 +777,8 @@
 
     <div class="section-head" style="margin-top: 0;"><div><h2>ตรวจสอบการจองของคุณ</h2><p class="sub">กรอกชื่อของคุณเพื่อดูรายการอุปกรณ์ที่จองไว้</p></div></div>
     <div class="user-bar">
-      <div class="field"><label for="user-name">ชื่อ-นามสกุล</label><input type="text" id="user-name" placeholder="เช่น บีม ใจดี"></div>
-      <div class="field"><label for="user-dept">แผนก</label><input type="text" id="user-dept" placeholder="เช่น การตลาด"></div>
+      <div class="field"><label for="user-name">ชื่อ-นามสกุล</label><input type="text" id="user-name" placeholder=""></div>
+      <div class="field"><label for="user-dept">แผนก</label><input type="text" id="user-dept" placeholder=""></div>
     </div>
     <div id="bookings-list"></div>
   </section>
@@ -845,36 +873,45 @@
           <div class="md-form-grid">
             <div class="field full">
               <label for="det-name">ชื่อ-นามสกุลผู้จอง *</label>
-              <input type="text" id="det-name" required placeholder="เช่น บีม ใจดี">
+              <input type="text" id="det-name" required placeholder="">
             </div>
             <div class="field full">
               <label for="det-dept">แผนก *</label>
-              <input type="text" id="det-dept" required placeholder="เช่น การตลาด">
+              <input type="text" id="det-dept" required placeholder="">
             </div>
           </div>
 
           <!-- Dynamic Advance Booking Badge -->
           <div class="advance-badge" id="advance-badge">📅 เป็นการจองล่วงหน้า</div>
 
-          <!-- THE RADIAL DIAL UI (VISION OS STYLE) -->
+          <!-- THE CAROUSEL UI (วันที่) -->
           <div style="margin-bottom: 16px;">
-            <label style="font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:8px;">วันที่และเวลาเริ่มต้น *</label>
-            <div class="dial-wrapper">
-              <div class="time-wedge"></div>
-              
-              <!-- Date Track -->
+            <label style="font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:8px;">วันที่เริ่มต้น *</label>
+            <div class="carousel-wrapper" id="date-wrapper">
+              <div class="carousel-center-wedge"></div>
               <div id="date-track" class="scroll-track"></div>
-              
-              <!-- Time Track -->
+            </div>
+          </div>
+
+          <!-- THE CAROUSEL UI (เวลาเริ่มต้น) -->
+          <div style="margin-bottom: 16px;">
+            <label style="font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:8px;">เวลาเริ่มต้น *</label>
+            <div class="carousel-wrapper short-carousel" id="start-time-wrapper">
+              <div class="carousel-center-wedge"></div>
               <div id="time-track" class="scroll-track"></div>
             </div>
           </div>
 
-          <div class="md-form-grid" style="margin-bottom: 24px;">
-            <div class="field full">
-              <label for="det-end">เวลาสิ้นสุด *</label>
-              <input type="time" id="det-end" required>
+          <!-- THE CAROUSEL UI (เวลาสิ้นสุด) -->
+          <div class="end-time-wrapper" style="margin-bottom: 24px;">
+            <label style="font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:8px;">เวลาสิ้นสุด *</label>
+            <div class="carousel-wrapper short-carousel" id="end-time-wrapper" style="margin-bottom:0;">
+              <div class="carousel-center-wedge"></div>
+              <div id="end-time-track" class="scroll-track"></div>
             </div>
+          </div>
+
+          <div class="md-form-grid" style="margin-bottom: 24px;">
             <div class="field full">
               <label for="det-note">หมายเหตุ (ถ้ามี)</label>
               <textarea id="det-note" placeholder="วัตถุประสงค์การใช้งาน..." style="min-height:50px;"></textarea>
@@ -1124,6 +1161,7 @@
 
   let selectedDate = todayISO();
   let selectedStartTime = '09:00';
+  let selectedEndTime = '10:00'; // เพิ่ม state เวลาสิ้นสุด
   let dialRafId = null;
   let activeDials = [];
 
@@ -1663,7 +1701,7 @@
   document.getElementById('user-dept').value = localStorage.getItem('yd_user_dept') || '';
 
   /* ========================================================================= */
-  /*                      APPLE VISION OS STYLE PHYSICS DIAL                   */
+  /*                      THE CAROUSEL UI (VIDEO STYLE)                        */
   /* ========================================================================= */
   function createArcDial(config) {
     const container = document.getElementById(config.containerId);
@@ -1689,8 +1727,11 @@
     function onStart(e) { state.isDragging = true; state.startX = getX(e); state.lastX = state.startX; state.startScroll = state.scroll; state.lastTime = Date.now(); state.velocity = 0; }
     function onMove(e) {
       if (!state.isDragging) return;
-      e.preventDefault(); 
       let x = getX(e); let dx = x - state.startX;
+      // หากต้องการลากซ้าย-ขวาได้อย่างลื่นไหลในมือถือ
+      if (Math.abs(dx) > 5) {
+        e.preventDefault(); // ป้องกันหน้าจอเลื่อนขึ้น-ลงขณะหมุนแนวนอน
+      }
       state.scroll = state.startScroll - dx * 0.015; 
       let now = Date.now(); let dt = Math.max(1, now - state.lastTime);
       state.velocity = -(x - state.lastX) * 0.015 / (dt / 16); 
@@ -1720,18 +1761,21 @@
 
       elements.forEach((el, i) => {
         let offset = i - state.scroll;
-        let angle = offset * config.anglePerItem;
         let dist = Math.abs(offset);
 
-        let scale = Math.max(0.7, 1.15 - dist * 0.20);
-        let opacity = Math.max(0, 1 - dist * 0.5);
-        let blur = dist * 1.5; 
+        // คำนวณแบบ 3D Horizontal Carousel ซ้อนแผ่นตามวิดีโออ้างอิง
+        let translateX = offset * config.spacing; 
+        let translateY = Math.pow(dist, 1.3) * 6; // ให้แผ่นด้านข้างตกต่ำลงโค้งเป็นวงกลมเล็กน้อย
+        let rotateZ = offset * 4; // เอียงแผ่นเวลาเลื่อน
+        
+        let scale = Math.max(0.6, 1 - dist * 0.12); // ปรับขนาดย่อลงเมื่อห่างตรงกลาง
+        let opacity = dist > 2.2 ? 0 : Math.max(0, 1 - dist * 0.4);
 
-        el.style.transform = `rotate(${angle}deg) translateY(${-config.radius}px) rotate(${-angle}deg) scale(${scale})`;
+        el.style.transform = `translate(-50%, -50%) translateX(${translateX}px) translateY(${translateY}px) rotateZ(${rotateZ}deg) scale(${scale})`;
         el.style.opacity = opacity;
-        el.style.filter = `blur(${blur}px)`;
+        el.style.zIndex = 100 - Math.round(dist * 10); // ซ้อนแผ่น
 
-        if (dist < 0.3) el.classList.add('active'); else el.classList.remove('active');
+        if (dist < 0.2) el.classList.add('active'); else el.classList.remove('active');
       });
     };
   }
@@ -1763,31 +1807,44 @@
       `});
     }
 
+    // เวลาเป็นของไทย
     let timeItems = [];
     for(let i=8; i<=18; i++) {
-      let val = `${i < 10 ? '0'+i : i}:00`; let ampm = i < 12 ? 'AM' : 'PM';
-      let displayTime = `${i > 12 ? (i-12 < 10 ? '0'+(i-12) : i-12) : (i < 10 ? '0'+i : i)}:00`;
-      timeItems.push({ val: val, html: `<div class="tm-val">${displayTime}</div><div class="tm-ampm">${ampm}</div>` });
+      let val = `${i < 10 ? '0'+i : i}:00`;
+      timeItems.push({ val: val, html: `<div class="tm-val">${val}</div><div class="tm-ampm">น.</div>` });
+    }
+
+    let endTimeItems = [];
+    for(let i=8; i<=19; i++) {
+      let val = `${i < 10 ? '0'+i : i}:00`;
+      endTimeItems.push({ val: val, html: `<div class="tm-val">${val}</div><div class="tm-ampm">น.</div>` });
     }
 
     activeDials.push(createArcDial({
       containerId: 'date-track',
       items: dateItems,
       initialIndex: 0,
-      radius: 160,            
-      anglePerItem: 18,      
-      itemClass: 'date-item',
+      spacing: 85, // กำหนดระยะห่างแผ่น      
+      itemClass: 'carousel-item',
       onSelect: (val) => { selectedDate = val; updateAdvanceBadge(); }
     }));
 
     activeDials.push(createArcDial({
       containerId: 'time-track',
       items: timeItems,
-      initialIndex: 1,        
-      radius: 80,
-      anglePerItem: 22,
-      itemClass: 'time-item',
+      initialIndex: 1, // เริ่มที่ 09:00     
+      spacing: 90,
+      itemClass: 'carousel-item time-card',
       onSelect: (val) => { selectedStartTime = val; }
+    }));
+
+    activeDials.push(createArcDial({
+      containerId: 'end-time-track',
+      items: endTimeItems,
+      initialIndex: 2, // เริ่มที่ 10:00
+      spacing: 90,
+      itemClass: 'carousel-item time-card',
+      onSelect: (val) => { selectedEndTime = val; }
     }));
 
     function animate() {
@@ -1831,7 +1888,8 @@
     // Form pre-fill
     document.getElementById('det-name').value = localStorage.getItem('yd_user_name') || '';
     document.getElementById('det-dept').value = localStorage.getItem('yd_user_dept') || '';
-    document.getElementById('det-end').value = '10:00';
+    selectedStartTime = '09:00';
+    selectedEndTime = '10:00';
     document.getElementById('det-note').value = '';
     document.getElementById('det-err').textContent = '';
     
@@ -1876,11 +1934,11 @@
     const errEl = document.getElementById('det-err');
     const name = document.getElementById('det-name').value.trim();
     const dept = document.getElementById('det-dept').value.trim();
-    const end = document.getElementById('det-end').value;
     const note = document.getElementById('det-note').value.trim();
     
     const date = selectedDate;
     const start = selectedStartTime;
+    const end = selectedEndTime; // ใช้ค่า selectedEndTime จาก Carousel สิ้นสุดแทนค่า Input เดิม
 
     if(date < todayISO()){ errEl.textContent = 'ไม่สามารถเลือกวันที่ย้อนหลังได้'; return; }
     if(start >= end){ errEl.textContent = 'เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่ม'; return; }
